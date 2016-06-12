@@ -92,8 +92,8 @@ module.exports = function (session) {
 
 
         cluster.set(psid, jsess, 'EX', ttl);
-        //fn.apply(this, arguments); 
-        fn.apply(this);
+        fn.apply(null, arguments); 
+        //fn.apply(this);
     };
 
     CachStore.prototype.destroy = function (sid, fn) {

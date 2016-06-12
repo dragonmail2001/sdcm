@@ -69,7 +69,7 @@ sock.isBrace = function (obj) {
     return bRet;
 }
 
-sock.output = function(req, fuc, cur, jum, err, msg) {
+function calfuc(req, fuc, cur, jum, err, msg) {
     req.uuid.cur = cur;  
     req.uuid.jum = jum;  
     req.uuid.msg = msg;
@@ -117,23 +117,23 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
     }
 
     if(!param || this.isBrace(param)) { 
-        this.output(req, fuc, req.uuid.cur + 1, true, true, 
+        calfuc(req, fuc, req.uuid.cur + 1, true, true, 
         	'cfg.itf.func return err');
         return; 
     }
 
     var body = '',sody = null;
     var option = this.prepare (itf, param, req.user);
-    var object = http.request(option, function(target){
-         target.setEncoding('utf8');
-         target.on('data',function(d){
+    var object = http.request(option, function(output){
+         output.setEncoding('utf8');
+         output.on('data',function(d){
              body += d;
          }).on('end', function() {
-            if(!target.headers['errs']) {
+            if(!output.headers['errs']) {
                 try{
                     sody = JSON.parse(body);//  eval('(' + body + ')');
                 }catch(err){
-	                this.output(req, fuc, req.uuid.cur + 1, false, true, err);            
+	                calfuc(req, fuc, req.uuid.cur + 1, false, true, err);            
                     return;
                 }
 
@@ -146,13 +146,13 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
                 }
             }else{
                 req.rslt[itf.uuid]=null;
-	            this.output(req, fuc, req.uuid.cur + 1, false, true, output.headers);            
+	            calfuc(req, fuc, req.uuid.cur + 1, false, true, output.headers);            
             }
          }); 
      });    
 
      object.on ('error', function(err) {
-        this.output(req, fuc, req.uuid.cur + 1, false, true, err);   
+        calfuc(req, fuc, req.uuid.cur + 1, false, true, err);   
      });
 
      object.setNoDelay(true);
