@@ -21,14 +21,14 @@ var loadLast = require('./sdcm.util.js').loadLast;
 var sock = exports = module.exports = {};
 
 sock.next = function(cfg, itf, req, res, fld, fle,fuc) {
-    var calls = []; itf.forEach(function(citf){
+    var call = []; itf.forEach(function(citf){
         req.uuid.max = req.uuid.max + 1; 
-        calls.push(function(func) {          
+        call.push(function(func) {          
             this.request(cfg, itf, req, res, fld, fle, fuc);
         });
     });
 
-    async.parallel(calls, function(err) {
+    async.parallel(call, function(err) {
         if (err) {
             logger('main').error("call-sock-err [%s] [%s] [%s]", new Date().getTime() - req.uuid.tim.getTime(),
                 JSON.stringify(req.conf), JSON.stringify(req.uuid));
