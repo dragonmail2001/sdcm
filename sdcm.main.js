@@ -19,17 +19,25 @@ var code = require('./sdcm.code.js');
 var form = require('./sdcm.form.js');
 var file = require('./sdcm.file.js');
 var html = require('./sdcm.html.js');
+
 var cach = require('./sdcm.cach.js')(session);
 var graceful = require('graceful');
 
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 
+//var redisStore = require('connect-redis')(session);
+
 function createSdcmObject() {
     var app = express();
     app.use(cookieParser('sdcm keyboard'));
     app.use(session({
-        store: new cach(),
+        store: new cach(conf.cach),
+        //store: new redisStore({
+        //    host: '192.168.18.251',
+        //    port: 6379,
+        //    db: 0
+        //}),        
         resave:true,
         saveUninitialized: false,
         secret: conf.sess.key,

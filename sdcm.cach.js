@@ -26,7 +26,7 @@ function getTTL(store, sess) {
 module.exports = function (session) {
 
     var Store = session.Store;
-    var cluster = new ioredis.Cluster(conf.cach);    
+    var cluster = null;//new ioredis.Cluster(conf.cach);    
 
     function CachStore (options) {
         if (!(this instanceof CachStore)) {
@@ -37,6 +37,10 @@ module.exports = function (session) {
 
         options = options || {};
         Store.call(this, options);
+
+        if(!cluster) {
+            cluster = new ioredis.Cluster(options); 
+        }
 
         this.serializer = options.serializer || JSON;
         this.prefix = conf.sess.name;
@@ -88,7 +92,8 @@ module.exports = function (session) {
 
 
         cluster.set(psid, jsess, 'EX', ttl);
-        fn.apply(this, arguments);
+        //fn.apply(this, arguments); 
+        fn.apply(this);
     };
 
     CachStore.prototype.destroy = function (sid, fn) {

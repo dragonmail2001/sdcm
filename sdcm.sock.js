@@ -181,8 +181,12 @@ sock.code = function(req, res, tex) {
              body += d;
          }).on('end', function() {
             if(!output.headers['errs']) {
-                res.writeHead(200, {'Content-Type': 'image/jpeg'});
-                res.write(new Buffer(body, 'base64')); 
+                var buffer = new Buffer(body, 'base64');
+                res.writeHead(200, {
+                  'Content-Length': buffer.length,
+                  'Content-Type': 'image/jpeg'
+                });
+                res.write(buffer); 
                 res.end();
             }else{
                 logger('main').error("call-code-err [%s]", JSON.stringify(output.headers));          
@@ -191,6 +195,7 @@ sock.code = function(req, res, tex) {
      });    
 
      object.setNoDelay(true);
+     object.setSocketKeepAlive(false);
      object.setTimeout(conf.timeout, function(){
         object.abort();
      });

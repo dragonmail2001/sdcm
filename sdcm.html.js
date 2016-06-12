@@ -15,27 +15,34 @@ var iset = require('./sdcm.iset.js');
 var logger = require('./sdcm.logj.js').getLogger;
 
 exports = module.exports = function html(req, res, next) {
-    if(!iset.set(req, res)) { return; }
+    if(!iset.set(req, res)) {
+        logger('main').error("set-html-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(),
+            JSON.stringify(req.conf), html);
+        return;
+    }
 
-    var html = "";
+    var html = null;
     try {
         if(conf.debug){
-            html = ejs.render(null, {user:req.user,rslt:req.rslt}, 
-                {cache:false,filename: req.conf.dtpl}); 
+            html = ejs.render(null, {user:req.user,rslt:req.rslt},
+                {cache:false,filename: req.conf.dtpl});
         }else{
-            html = ejs.render(null, {user:req.user,rslt:req.rslt}, 
-                {cache:true,filename: req.conf.dtpl}); 
+            html = ejs.render(null, {user:req.user,rslt:req.rslt},
+                {cache:true,filename: req.conf.dtpl});
         }
     }catch(exc) {
-        html = "name: " + exc.name + "message: " + exc.message + 
-            "lineNumber: " + exc.lineNumber + 
-            "fileName: " + exc.fileName + 
+        html = "name: " + exc.name + "message: " + exc.message +
+            "lineNumber: " + exc.lineNumber + "fileName: " + exc.fileName +
             "stack: " + exc.stack;
 
-        logger('main').error("call-html-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
-            JSON.stringify(req.conf), html);            
+        logger('main').error("call-html-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(),
+            JSON.stringify(req.conf));
     }
-    
-    res.end(html); 
+
+    res.writeHead(200, {
+      'Content-Length': new Buffer(html,'utf-8').length,
+      'Content-Type': 'text/html'
+    });
+    res.end(html);
 };
 

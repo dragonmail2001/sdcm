@@ -64,18 +64,14 @@ exports.loadConf = function loadConf(module) {
 }
 
 function renderHtml(rslt, req, res, fld, fle) {
-    var name = req.conf.dtpl;
-    var html = null;
+    var name = req.conf.dtpl, html = null, code = 200;
     try {
         if(conf.debug){
             html = ejs.render(null, {user:req.user,rslt:req.rslt},{cache:false,filename: req.conf.dtpl}); 
         }else{
             html = ejs.render(null, {user:req.user,rslt:req.rslt},{cache:true,filename: req.conf.dtpl}); 
         }
-
-        res.writeHead(200, {'Content-Type': 'text/html;encode=UTF-8'});
     }catch(exc) {
-        res.writeHead(500, {'Content-Type': 'text/html;encode=UTF-8'});
         logj.getLogger('main').error("load-mod-err [%s] [%s] [%s] [%s] [%s]", 
             exc.name, exc.message, exc.lineNumber, exc.fileName, exc.stack); 
         html = "name: " + exc.name + 
@@ -84,13 +80,15 @@ function renderHtml(rslt, req, res, fld, fle) {
             "fileName: " + exc.fileName + 
             "stack: " + exc.stack;
         if(conf.debug) {
-            res.write('err:'+html);
-            res.write('<br/><br/>');            
-            res.write('err:'+JSON.stringify(rslt,null,4));
-            res.write('<br/><br/>');
+            html = html + 'rslt:'+JSON.stringify(rslt,null,4);
         }    
-    }
 
+        code = 500;
+    }
+    res.writeHead(code, {
+      'Content-Length': html.length,
+      'Content-Type': 'text/html;encode=UTF-8'
+    });
     res.end(html); 
 }
 

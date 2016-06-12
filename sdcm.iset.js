@@ -12,6 +12,7 @@ var getContextName = require('./sdcm.util.js').getContextName;
 var getClientIp = require('./sdcm.util.js').getClientIp;  
 var conf = require('./configure');
 var path = require('path');
+var url = require('url');
 
 var iset = exports = module.exports = {};
 
@@ -36,7 +37,7 @@ iset.set = function(req, res) {
     req.user.user = req.session.user;
     req.user.addr = getClientIp(req); 
 
-    var cctx = req.baseUrl.split('/'); 
+    var cctx = req.baseUrl.split('/');
     if(cctx.length <= 0) {
         res.jsonp({"code": -900000,
             "success": false,
