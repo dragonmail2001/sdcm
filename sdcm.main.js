@@ -26,18 +26,11 @@ var graceful = require('graceful');
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
 
-//var redisStore = require('connect-redis')(session);
-
 function createSdcmObject() {
     var app = express();
     app.use(cookieParser('sdcm keyboard'));
     app.use(session({
-        store: new cach(conf.cach),
-        //store: new redisStore({
-        //    host: '192.168.18.251',
-        //    port: 6379,
-        //    db: 0
-        //}),        
+        store: new cach(conf.cach),        
         resave:true,
         saveUninitialized: false,
         secret: conf.sess.key,
