@@ -8,7 +8,7 @@
  * @date    2015-10-24
  *
  */
-var conf = require('./configure'); 
+var conf = require('./cfg'); 
 var sock = require('./sdcm.sock.js');
 
 function generate(){

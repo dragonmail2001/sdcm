@@ -8,7 +8,7 @@
  * @date    2015-10-24
  *
  */
-var config = require('./configure');
+var config = require('./cfg');
 var log4js = require('log4js');
 
 /**

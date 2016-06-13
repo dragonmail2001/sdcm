@@ -14,9 +14,9 @@ var http = require('http');
 var util = require('util');
 var async = require('async');
 
-var conf = require('./configure'); 
-var logger = require('./sdcm.logj.js').getLogger;
-var loadLast = require('./sdcm.util.js').loadLast;
+var conf = require('./cfg'); 
+var logj = require('./sdcm.logj.js').getLogger;
+var last = require('./sdcm.util.js').loadLast;
 
 var sock = exports = module.exports = {};
 
@@ -30,17 +30,17 @@ sock.next = function(cfg, itf, req, res, fld, fle,fuc) {
 
     async.parallel(call, function(err) {
         if (err) {
-            logger('main').error("call-sock-err [%s] [%s] [%s]", new Date().getTime() - req.uuid.tim.getTime(),
+            logj('main').error("call-sock-err [%s] [%s] [%s]", new Date().getTime() - req.uuid.tim.getTime(),
                 JSON.stringify(req.conf), JSON.stringify(req.uuid));
         }
 
         if(req.uuid.cur >= req.uuid.max){
             if(req.uuid.jum) {
                 if (conf.debug && req.uuid.moc) {
-                    loadLast(cfg, req, res, fld, fle);
+                    last(cfg, req, res, fld, fle);
                 }
             }else{            
-                loadLast(cfg, req, res, fld, fle);
+                last(cfg, req, res, fld, fle);
             }
         }
     });     

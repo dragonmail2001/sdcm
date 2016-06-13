@@ -37,7 +37,8 @@
     "ftp":"0.3.10",
     "request-promise":"1.0.2",
     "express-session":"1.12.1",
-    "ioredis":"2.0.1"
+    "ioredis":"2.0.1",
+    "connect-redis":"3.0.1"
   },
   "devDependencies": {
     "mocha": "*",

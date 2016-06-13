@@ -9,8 +9,8 @@
  * @date    2015-10-24
  *
  */
-var ejs = require('./ejs/ejs.js'); 
-var conf = require('./configure');
+var conf = require('./cfg');
+var ejs = require('./sdcm.eejs.js'); 
 var logj = require('./sdcm.logj.js');
 
 exports.getParameter = function getParameter(req,name) {
@@ -86,7 +86,7 @@ function renderHtml(rslt, req, res, fld, fle) {
         code = 500;
     }
     res.writeHead(code, {
-      'Content-Length': html.length,
+      'Content-Length': new Buffer(html,'utf-8').length,
       'Content-Type': 'text/html;encode=UTF-8'
     });
     res.end(html); 

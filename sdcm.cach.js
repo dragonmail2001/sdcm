@@ -9,9 +9,9 @@
  * @date    2015-10-24
  *
  */
+var ioredis = require('ioredis'); 
+var conf = require('./cfg'); 
 var util = require("util"); 
-var ioredis = require('ioredis');
-var conf = require('./configure'); 
 var noop = function(){};
 
 var oneDay = 86400;

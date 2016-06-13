@@ -9,14 +9,14 @@
  * @date    2015-10-24
  *
  */
-var ejs = require('./ejs/ejs');  
-var conf = require('./configure'); 
+var conf = require('./cfg'); 
+var ejs = require('./sdcm.eejs.js');  
 var iset = require('./sdcm.iset.js');
-var logger = require('./sdcm.logj.js').getLogger;
+var logj = require('./sdcm.logj.js').getLogger;
 
 exports = module.exports = function html(req, res, next) {
     if(!iset.set(req, res)) {
-        logger('main').error("set-html-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(),
+        logj('main').error("set-html-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(),
             JSON.stringify(req.conf), html);
         return;
     }
@@ -35,13 +35,13 @@ exports = module.exports = function html(req, res, next) {
             "lineNumber: " + exc.lineNumber + "fileName: " + exc.fileName +
             "stack: " + exc.stack;
 
-        logger('main').error("call-html-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(),
+        logj('main').error("call-html-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(),
             JSON.stringify(req.conf));
     }
 
     res.writeHead(200, {
       'Content-Length': new Buffer(html,'utf-8').length,
-      'Content-Type': 'text/html'
+      'Content-Type': 'text/html;encode=UTF-8'
     });
     res.end(html);
 };
