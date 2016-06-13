@@ -14,7 +14,7 @@ var http = require('http');
 var util = require('util');
 var async = require('async');
 
-var conf = require('./cfg'); 
+var conf = require('./sdcm.conf.js');
 var logj = require('./sdcm.logj.js').getLogger;
 var last = require('./sdcm.util.js').loadLast;
 

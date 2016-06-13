@@ -8,10 +8,10 @@
  * @author  jinglong.zhaijl
  * @date    2015-10-24
  *
- */
-var conf = require('./cfg'); 
+ */ 
 var ejs = require('./sdcm.eejs.js');  
 var iset = require('./sdcm.iset.js');
+var conf = require('./sdcm.conf.js');
 var logj = require('./sdcm.logj.js').getLogger;
 
 exports = module.exports = function html(req, res, next) {

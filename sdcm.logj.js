@@ -8,7 +8,7 @@
  * @date    2015-10-24
  *
  */
-var config = require('./cfg');
+var conf = require('./sdcm.conf.js');
 var log4js = require('log4js');
 
 /**
@@ -26,10 +26,10 @@ log4js.configure({
             pattern: '[%d %p %c] %m%n'
         },	
         pattern: '.yyyy-MM-dd.log',alwaysIncludePattern: true,			
-        filename: config.ldir+'/main', 
+        filename: conf.ldir+'/main', 
     }],
     levels: {
-      "[all]": config.loglevel  	
+      "[all]": conf.loglevel  	
     }
 });
 

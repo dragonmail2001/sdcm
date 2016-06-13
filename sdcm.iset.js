@@ -10,7 +10,7 @@
  */
 var getContextName = require('./sdcm.util.js').getContextName; 
 var getClientIp = require('./sdcm.util.js').getClientIp;  
-var conf = require('./cfg');
+var conf = require('./sdcm.conf.js');
 var path = require('path');
 var url = require('url');
 

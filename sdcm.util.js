@@ -9,8 +9,8 @@
  * @date    2015-10-24
  *
  */
-var conf = require('./cfg');
 var ejs = require('./sdcm.eejs.js'); 
+var conf = require('./sdcm.conf.js');
 var logj = require('./sdcm.logj.js');
 
 exports.getParameter = function getParameter(req,name) {

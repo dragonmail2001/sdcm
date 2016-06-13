@@ -9,8 +9,8 @@
  * @date    2015-10-24
  *
  */
+var conf = require('./sdcm.conf.js');  
 var ioredis = require('ioredis'); 
-var conf = require('./cfg'); 
 var util = require("util"); 
 var noop = function(){};
 

@@ -14,10 +14,10 @@ var path = require('path');
 var async = require('async');
 var multiparty = require('multiparty');
 
-var conf = require('./cfg'); 
 var load = require('./sdcm.util.js').loadConf; 
 var last = require('./sdcm.util.js').loadLast;
 var logj = require('./sdcm.logj.js').getLogger;
+var conf = require('./sdcm.conf.js'); 
 var sock = require('./sdcm.sock.js');
 var iset = require('./sdcm.iset.js');
 
