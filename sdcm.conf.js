@@ -12,7 +12,7 @@
 var path = require('path');
 
 var config  = {   
-    enableCluster: false,
+    cluster: false,
     httpport: 8001,
     timeout:20000,
     debug: true, 

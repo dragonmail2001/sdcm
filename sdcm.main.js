@@ -51,7 +51,7 @@ function createSdcmObject() {
     return app; 
 }
 
-if (!conf.enableCluster) {
+if (!conf.cluster) {
     var app = createSdcmObject();
     app.listen(conf.httpport);
     console.log('[%s] [worker:%d] Server started, listen at %d', new Date(), process.pid, conf.httpport);
