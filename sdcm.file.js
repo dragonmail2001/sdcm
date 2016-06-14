@@ -33,7 +33,7 @@ exports = module.exports = function file (req, res, next) {
     }
 
     var form = new multiparty.Form({uploadDir: conf.fdir+'/'});
-    req.uuid.upf = 1; form.parse(req, function(err, fld, fle){  
+    form.parse(req, function(err, fld, fle){  
         if(err){
             req.uuid.err = true; req.uuid.msg = err;    
             res.jsonp({"code": -300000, "success": false,
@@ -44,6 +44,8 @@ exports = module.exports = function file (req, res, next) {
                 JSON.stringify(req.uuid), JSON.stringify(err));            
             return;
         } 
+
+        sock.file(req, res, fld, fle);
 
         var cfg = load(req.conf.dcfg); 
         if(!cfg.itfs || cfg.itfs.length <= 0) {

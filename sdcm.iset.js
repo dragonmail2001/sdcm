@@ -24,7 +24,7 @@ iset.set = function(req, res) {
 
     req.uuid.max = 0;
     req.uuid.cur = 0;
-    req.uuid.upf = 0;
+    //req.uuid.upf = 0;
     req.uuid.msg = 'ok';
     req.uuid.err = false;
     req.uuid.jum = false;

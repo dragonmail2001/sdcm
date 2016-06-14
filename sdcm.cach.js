@@ -14,13 +14,11 @@ var ioredis = require('ioredis');
 var util = require("util"); 
 var noop = function(){};
 
-var oneDay = 86400;
-
 function getTTL(store, sess) {
   var maxAge = sess.cookie.maxAge;
   return store.ttl || (typeof maxAge === 'number'
     ? Math.floor(maxAge / 1000)
-    : oneDay);
+    : 86400); //oneDay
 }
 
 module.exports = function (session) {

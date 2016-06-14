@@ -10,9 +10,12 @@
  */
 var http = require('http');
 var express = require('express');
+var cluster = require('cluster');
+var graceful = require('graceful');
 var bodyParser = require('body-parser'); 
-var cookieParser = require('cookie-parser');
 var session = require('express-session');
+var cookieParser = require('cookie-parser');
+
 var conf = require('./sdcm.conf.js');
 var logj = require('./sdcm.logj.js');
 var code = require('./sdcm.code.js');
@@ -20,11 +23,8 @@ var form = require('./sdcm.form.js');
 var file = require('./sdcm.file.js');
 var html = require('./sdcm.html.js');
 
-var cach = require('./sdcm.cach.js')(session);
-var graceful = require('graceful');
-
-var cluster = require('cluster');
-var numCPUs = require('os').cpus().length;
+var cach = require('./sdcm.cach.js')(session)
+    , numCPUs = require('os').cpus().length;
 
 function createSdcmObject() {
     var app = express();

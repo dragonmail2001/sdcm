@@ -112,10 +112,6 @@ sock.file = function(req,res, fld, fle) {
 
 sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
     var param = itf.func (req, res, fld, fle);
-    if(req.uuid.upf == 1) {
-        this.file(req, res, fld, fle);
-    }
-
     if(!param || this.isBrace(param)) { 
         calfuc(req, fuc, req.uuid.cur + 1, true, true, 
         	'cfg.itf.func return err');
