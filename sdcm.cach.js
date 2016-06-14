@@ -37,7 +37,11 @@ module.exports = function (session) {
         Store.call(this, options);
 
         if(!cluster) {
-            cluster = new ioredis.Cluster(options); 
+            if(conf.sess.cluster) {
+                cluster = new ioredis.Cluster(options); 
+            }else{
+                cluster = new ioredis(options[0]); 
+            }
         }
 
         this.serializer = options.serializer || JSON;

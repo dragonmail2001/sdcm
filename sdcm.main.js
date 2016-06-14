@@ -23,24 +23,23 @@ var form = require('./sdcm.form.js');
 var file = require('./sdcm.file.js');
 var html = require('./sdcm.html.js');
 
-var cach = require('./sdcm.cach.js')(session)
-    , numCPUs = require('os').cpus().length;
+var numCPUs = require('os').cpus().length;
+var cach = require('./sdcm.cach.js')(session);
 
 function createSdcmObject() {
     var app = express();
-    app.use(cookieParser('sdcm keyboard'));
     app.use(session({
         store: new cach(conf.cach),        
-        resave:true,
         saveUninitialized: false,
         secret: conf.sess.key,
         name: conf.sess.name,
+        resave:true,
         cookie: {
             domain: conf.sess.domain,
             maxAge: conf.sess.time
         }
     }));
-
+    app.use(cookieParser(conf.sess.key));
     app.use(bodyParser.urlencoded({ extended: true }));
     app.use(bodyParser.json());
     app.use('*.cci', code);

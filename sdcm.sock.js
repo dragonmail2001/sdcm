@@ -168,39 +168,53 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
 }
 
 sock.code = function(req, res, tex) {
-    var body = '', option = conf.code; option.agent = false;
-    option.headers = {'claz':'["java.lang.String"]'};
+    var body = '', option = {
+        hostname: conf.code.hostname,
+        method: conf.code.method,
+        path: conf.code.path,
+        port: conf.code.port,
+        agent: false
+    }; 
 
+    option.headers = {'claz':'["java.lang.String"]'};
+    if(conf.code.type != 'dscm') {
+        option.headers = null;
+        option.path = option.path + '?code='+tex;
+    }
+    
     var object = http.request(option, function(output){
-         output.setEncoding('utf8');
-         output.on('data',function(d){
-             body += d;
-         }).on('end', function() {
+        output.setEncoding(conf.code.type == 'dscm' ? 'UTF-8' : 'binary');
+        output.on('data',function(d){
+            body += d;
+        }).on('end', function() {
             if(!output.headers['errs']) {
-                var buffer = new Buffer(body, 'base64');
+                var encode = conf.code.type == 'dscm' ? 'base64' : 'binary'
+                , buffer = new Buffer(body, encode);
                 res.writeHead(200, {
                   'Content-Length': buffer.length,
                   'Content-Type': 'image/jpeg'
                 });
                 res.write(buffer); 
-                res.end();
             }else{
                 logj('main').error("call-code-err [%s]", JSON.stringify(output.headers));          
             }
-         }); 
-     });    
+            res.end();
+        }); 
+    });    
 
-     object.setNoDelay(true);
-     object.setSocketKeepAlive(false);
-     object.setTimeout(conf.timeout, function(){
+    object.setNoDelay(true);
+    object.setSocketKeepAlive(false);
+    object.setTimeout(conf.timeout, function(){
         object.abort();
-     });
+    });
 
-     object.on ('error', function(err) {
+    object.on ('error', function(err) {
         res.writeHead(200, {'Content-Type': 'image/jpeg'});
         res.end('sys-code-err');
-     });     
+    });     
 
-     object.write(JSON.stringify([tex]));  
-     object.end();
+    if(conf.code.type == 'dscm') {
+        object.write(JSON.stringify([tex]));  
+    }
+    object.end();
 }

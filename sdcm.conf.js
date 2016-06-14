@@ -39,13 +39,20 @@ var config  = {
         domain: '',
         key: 'sdcm keyboard',
         name: 'sdcm.sid',
+        cluster: true,
         time: 600000                             //10分钟
     },
     code: {
         path: '/verifyService?actn=code',
         hostname: '192.168.18.198',
         method: 'post',
-        port: '5524'
+        port: '5524',
+        type: 'dscm'        
+        //path: '/admin-web/admin/common/captcha.cgi',
+        //hostname: '192.168.18.198',
+        //method: 'get',
+        //port: '8001',
+        //type: 'http'
     }, 
     fdir:'/Workspace/cloudy/fdir',                 //前端上传文件保存的临时目录
     dcfg:'/Workspace/cloudy/work'                 //前端请求资源文件本地存放路径
