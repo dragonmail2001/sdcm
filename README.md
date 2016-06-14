@@ -12,13 +12,21 @@ npm install log4js@0.6.26 -g
 #配置文件说明， 后续会增加单机版redis的支持
 
 var config  = {   
+
     cluster: false,                                  //是否运行在集群模式
+    
     httpport: 8001,                                  //服务启动在哪个端口
+    
     timeout:20000,                                   //调用后端服务的超时时间，单位ms
+    
     debug: true,                                     //是否运行在debug模式，如果是开发环境建议设置成true(*.cfg *.ejs不会缓存便于开发)否则设置成false，
+    
     ldir: '/Workspace/cloudy/logs',                  //日志文件目录    
+    
     cftp:{                                           //后端ftp服务设置，用户上传的文件会上传到ftp服务
+
 	    host: "192.168.18.248",
+
 	    port: 21,
 	    user: "devftp",
 	    password: "aidaidev",
