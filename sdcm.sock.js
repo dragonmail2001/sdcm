@@ -91,7 +91,7 @@ sock.file = function(req,res, fld, fle) {
             ftpClient.on('ready', function() {
                 ftpClient.put(the.path, conf.cftp.path+the.originalFilename, function(err) {
                     if (err) {
-                        logger('main').error("file upload err by [%s]", the.path, JSON.stringify(err));                      
+                        logj('main').error("file upload err by [%s]", the.path, JSON.stringify(err));                      
                     }
 
                     ftpClient.end();
@@ -99,7 +99,7 @@ sock.file = function(req,res, fld, fle) {
 
                     fs.exists(the.path, function (exists) {
                         if(exists){
-                            logger('main').error('ftp suc and delete file [%s]', the.path);
+                            logj('main').error('ftp suc and delete file [%s]', the.path);
                             fs.unlink(the.path);
                         }
                     });                             
@@ -185,7 +185,7 @@ sock.code = function(req, res, tex) {
                 res.write(buffer); 
                 res.end();
             }else{
-                logger('main').error("call-code-err [%s]", JSON.stringify(output.headers));          
+                logj('main').error("call-code-err [%s]", JSON.stringify(output.headers));          
             }
          }); 
      });    
