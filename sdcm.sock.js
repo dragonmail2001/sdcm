@@ -170,14 +170,15 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
 sock.code = function(req, res, tex) {
     var body = '', option = {
         hostname: conf.code.hostname,
-        method: conf.code.method,
         path: conf.code.path,
         port: conf.code.port,
+        method: 'post',
         agent: false
     }; 
 
     option.headers = {'claz':'["java.lang.String"]'};
     if(conf.code.type != 'dscm') {
+        option.method = 'get';
         option.headers = null;
         option.path = option.path + '?code='+tex;
     }

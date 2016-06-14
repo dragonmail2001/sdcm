@@ -45,12 +45,10 @@ var config  = {
     code: {
         path: '/verifyService?actn=code',
         hostname: '192.168.18.198',
-        method: 'post',
         port: '5524',
         type: 'dscm'        
         //path: '/admin-web/admin/common/captcha.cgi',
         //hostname: '192.168.18.198',
-        //method: 'get',
         //port: '8001',
         //type: 'http'
     }, 
