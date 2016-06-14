@@ -28,7 +28,7 @@ exports = module.exports = function file (req, res, next) {
             "message": '请求配置信息错误'
         });  
 
-        logger('main').error("file-err0 [%s]", new Date().getTime() - req.uuid.tim.getTime());          
+        logj('main').error("file-err0 [%s]", new Date().getTime() - req.uuid.tim.getTime());          
         return; 
     }
 
