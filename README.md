@@ -4,6 +4,10 @@ nodejs|top|mtop|service|sdcm|dscm|rpc|ddd data convert matrix
 
 #install
 
+npm config set registry https://registry.npm.taobao.org 
+
+npm info underscore （如果上面配置正确这个命令会有字符串response）
+
 NODE_PATH  系统需要设置NodeJS环境变量
 
 npm install log4js@0.6.26 -g
