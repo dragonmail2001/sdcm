@@ -31,12 +31,12 @@ exports = module.exports = function file (req, res, next) {
         return; 
     }
 
-    var form = new multiparty.Form({uploadDir: conf.fdir+'/', maxFieldsSize:conf.umfs});
+    var form = new multiparty.Form({uploadDir: conf.fdir+'/', maxFilesSize:conf.umfs});
     form.parse(req, function(err, fld, fle){  
         if(err){
             req.uuid.err = true; req.uuid.msg = err;    
             res.jsonp({"code": -300000, "success": false,
-                "message": 'form parse err'
+                "message": 'file size exceeded 2m'
             }); 
 
             logj('main').error("file-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 

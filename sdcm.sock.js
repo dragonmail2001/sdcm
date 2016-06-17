@@ -99,7 +99,7 @@ sock.file = function(req,res, fld, fle) {
 
                     fs.exists(the.path, function (exists) {
                         if(exists){
-                            logj('main').error('ftp suc and delete file [%s]', the.path);
+                            logj('main').info('ftp suc and delete file [%s]', the.path);
                             fs.unlink(the.path);
                         }
                     });                             
