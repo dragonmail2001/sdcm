@@ -1,5 +1,4 @@
 /*
-/*
  * Copyright 2015-2115 the original author or authors.
  *
  * Licensed under the MIT Licensed
@@ -56,7 +55,7 @@ module.exports = function (session) {
         if (!fn) fn = noop;
 
         cluster.get(psid, function (err, data) {
-            if(err) return fn(er);
+            if(err) return fn(err);
             if (!data) return fn();
 
             var result;

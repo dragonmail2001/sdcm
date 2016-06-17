@@ -1,5 +1,4 @@
 /*
-/*
  * Copyright 2015-2115 the original author or authors.
  *
  * Licensed under the MIT Licensed
