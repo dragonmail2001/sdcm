@@ -31,7 +31,7 @@ exports = module.exports = function file (req, res, next) {
         return; 
     }
 
-    var form = new multiparty.Form({uploadDir: conf.fdir+'/'});
+    var form = new multiparty.Form({uploadDir: conf.fdir+'/', maxFieldsSize:conf.umfs});
     form.parse(req, function(err, fld, fle){  
         if(err){
             req.uuid.err = true; req.uuid.msg = err;    
