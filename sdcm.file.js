@@ -44,8 +44,6 @@ exports = module.exports = function file (req, res, next) {
             return;
         } 
 
-        sock.file(req, res, fld, fle);
-
         var cfg = load(req.conf.dcfg); 
         if(!cfg) {
             res.jsonp({"code": -800000,
@@ -57,6 +55,8 @@ exports = module.exports = function file (req, res, next) {
             return;
         }
 
+        sock.file(req, res, fld, fle);
+        
         if(!cfg.itfs || cfg.itfs.length <= 0) {
             last(cfg, req, res, fld, fle);
             return;
