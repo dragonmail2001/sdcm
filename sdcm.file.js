@@ -36,7 +36,7 @@ exports = module.exports = function file (req, res, next) {
         if(err){
             req.uuid.err = true; req.uuid.msg = err;    
             res.jsonp({"code": -300000, "success": false,
-                "message": 'file size exceeded 2m'
+                "message": 'file size exceeded '+conf.umfs
             }); 
 
             logj('main').error("file-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
