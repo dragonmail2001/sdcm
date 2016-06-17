@@ -112,5 +112,5 @@ exports.loadLast = function loadLast(cfg, req, res, fld, fle) {
         }
     }
 
-    logj.getLogger('main').info('request url %s %s', req.baseUrl, new Date().getTime()-req.uuid.tim.getTime());
+    logj.getLogger('main').info('request url %s %s', req.baseUrl, new Date().getTime() - req.uuid.tim.getTime());
 }
