@@ -26,20 +26,25 @@ exports = module.exports = function form(req, res, next) {
             "message": '请求配置信息错误'
         });  
 
-        logj('main').error("call-form-err0 [%s]", new Date().getTime() - req.uuid.tim.getTime());          
+        logj('main').error("form-err0 [%s][%s]", req.baseUrl, new Date().getTime() - req.uuid.tim.getTime());          
         return; 
     }
 
     var cfg = load(req.conf.dcfg);
-    if(!cfg || !cfg.itfs || cfg.itfs.length <= 0) {
+    if(!cfg) {
         res.jsonp({"code": -800000,
             "success": false,
             "message": '请求配置信息错误'
         });  
 
-        logj('main').error("call-form-err1 [%s]", new Date().getTime() - req.uuid.tim.getTime());              
+        logj('main').error("form-err1 [%s][%s]", req.baseUrl,new Date().getTime() - req.uuid.tim.getTime());              
         return;
     }
+
+    if(!cfg.itfs || cfg.itfs.length <= 0) {
+        last(cfg, req, res, null,null);
+        return;
+    }    
 
     var call = []; cfg.itfs.forEach (function (itf) {
         req.uuid.max = req.uuid.max + 1; 

@@ -39,14 +39,24 @@ exports = module.exports = function file (req, res, next) {
                 "message": 'file size exceeded ' + conf.umfs
             }); 
 
-            logj('main').error("file-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
-                JSON.stringify(req.uuid), JSON.stringify(err));            
+            logj('main').error("file-err1 [%s][%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
+                JSON.stringify(req.uuid), JSON.stringify(err), req.baseUrl);            
             return;
         } 
 
         sock.file(req, res, fld, fle);
 
         var cfg = load(req.conf.dcfg); 
+        if(!cfg) {
+            res.jsonp({"code": -800000,
+                "success": false,
+                "message": '请求配置信息错误'
+            });  
+
+            logj('main').error("file-err2 [%s][%s]", req.baseUrl,new Date().getTime() - req.uuid.tim.getTime());              
+            return;
+        }
+
         if(!cfg.itfs || cfg.itfs.length <= 0) {
             last(cfg, req, res, fld, fle);
             return;
