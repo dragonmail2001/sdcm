@@ -55,8 +55,8 @@ exports = module.exports = function form(req, res, next) {
 
     async.parallel(call, function(err) {
         if (err) {
-            logj('main').error("call-form-err2 [%s][%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
-                JSON.stringify(req.conf), JSON.stringify(req.uuid), JSON.stringify(err));
+            logj('main').error("call-form-err2 [%s][%s][%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
+                JSON.stringify(req.conf), JSON.stringify(req.uuid), JSON.stringify(err), req.baseUrl);
         }
 
         if(req.uuid.cur >= req.uuid.max){

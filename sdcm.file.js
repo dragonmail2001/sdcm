@@ -27,7 +27,7 @@ exports = module.exports = function file (req, res, next) {
             "message": '请求配置信息错误'
         });  
 
-        logj('main').error("file-err0 [%s]", new Date().getTime() - req.uuid.tim.getTime());          
+        logj('main').error("file-err0 [%s][%s]", req.baseUrl, new Date().getTime() - req.uuid.tim.getTime());          
         return; 
     }
 
@@ -56,7 +56,7 @@ exports = module.exports = function file (req, res, next) {
         }
 
         sock.file(req, res, fld, fle);
-        
+
         if(!cfg.itfs || cfg.itfs.length <= 0) {
             last(cfg, req, res, fld, fle);
             return;
@@ -71,8 +71,8 @@ exports = module.exports = function file (req, res, next) {
 
         async.parallel(call, function(err) {
             if (err) {
-                logj('main').error("file-call-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
-                    JSON.stringify(err), JSON.stringify(req.uuid));
+                logj('main').error("file-call-err [%s][%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
+                    JSON.stringify(err), JSON.stringify(req.uuid), req.baseUrl);
             }
 
             if(req.uuid.cur >= req.uuid.max){
