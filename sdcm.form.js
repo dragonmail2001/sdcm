@@ -14,7 +14,7 @@ var events = require('events');
 
 var last = require('./sdcm.util.js').loadLast;
 var load = require('./sdcm.util.js').loadConf;
-var logj = require('./sdcm.logj.js').getLogger;
+var logj = require('./sdcm.logj.js');
 var sock = require('./sdcm.sock.js');
 var iset = require('./sdcm.iset.js');
 var conf = require('./sdcm.conf.js'); 
