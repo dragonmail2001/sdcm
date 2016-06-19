@@ -21,30 +21,19 @@ var conf = require('./sdcm.conf.js');
 
 exports = module.exports = function form(req, res, next) {
     if(!iset.set(req, res)) { 
-        res.jsonp({"code": -600000,
-            "success": false,
-            "message": '请求配置信息错误'
+        res.jsonp({"code": -500000,
+            "message": 'enverr',
+            "success": false
         });  
 
-        logj('main').error("form-err0 [%s][%s]", req.baseUrl, new Date().getTime() - req.uuid.tim.getTime());          
+        logj.reqerr("call-form-err0", req, 'enverr');          
         return; 
     }
 
-    var cfg = load(req.conf.dcfg);
-    if(!cfg) {
-        res.jsonp({"code": -800000,
-            "success": false,
-            "message": '请求配置信息错误'
-        });  
-
-        logj('main').error("form-err1 [%s][%s]", req.baseUrl,new Date().getTime() - req.uuid.tim.getTime());              
+    var cfg = sock.loader(req, res);
+    if(!cfg) {              
         return;
-    }
-
-    if(!cfg.itfs || cfg.itfs.length <= 0) {
-        last(cfg, req, res, null,null);
-        return;
-    }    
+    } 
 
     var call = []; cfg.itfs.forEach (function (itf) {
         req.uuid.max = req.uuid.max + 1; 
@@ -55,8 +44,7 @@ exports = module.exports = function form(req, res, next) {
 
     async.parallel(call, function(err) {
         if (err) {
-            logj('main').error("call-form-err2 [%s][%s][%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
-                JSON.stringify(req.conf), JSON.stringify(req.uuid), JSON.stringify(err), req.baseUrl);
+            logj.reqerr("call-form-err1", req, err);
         }
 
         if(req.uuid.cur >= req.uuid.max){

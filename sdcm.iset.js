@@ -40,8 +40,8 @@ iset.set = function(req, res) {
     var cctx = req.baseUrl.split('/');
     if(cctx.length <= 0) {
         res.jsonp({"code": -900000,
-            "success": false,
-            "message": '请求路径格式错误'
+            "message": 'ctxerr',
+            "success": false
         });
         return false;
     } 

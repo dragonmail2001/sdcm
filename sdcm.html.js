@@ -11,12 +11,15 @@
 var ejs = require('./sdcm.eejs.js');  
 var iset = require('./sdcm.iset.js');
 var conf = require('./sdcm.conf.js');
-var logj = require('./sdcm.logj.js').getLogger;
+var logj = require('./sdcm.logj.js');
 
 exports = module.exports = function html(req, res, next) {
     if(!iset.set(req, res)) {
-        logj('main').error("set-html-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(),
-            JSON.stringify(req.conf), html);
+        res.jsonp({"code": -500000,
+            "message": 'enverr',
+            "success": false
+        });          
+        logj.reqerr("set-html-err", req, 'evnerr');
         return;
     }
 
@@ -34,8 +37,7 @@ exports = module.exports = function html(req, res, next) {
             "lineNumber: " + exc.lineNumber + "fileName: " + exc.fileName +
             "stack: " + exc.stack;
 
-        logj('main').error("call-html-err [%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(),
-            JSON.stringify(req.conf));
+        logj.reqerr("call-html-err1", req, exc);
     }
 
     res.writeHead(200, {

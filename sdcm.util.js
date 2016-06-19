@@ -8,7 +8,7 @@
  * @date    2015-10-24
  *
  */
-var ejs = require('./sdcm.eejs.js'); 
+var eejs = require('./sdcm.eejs.js'); 
 var conf = require('./sdcm.conf.js');
 var logj = require('./sdcm.logj.js');
 
@@ -55,8 +55,7 @@ exports.loadConf = function loadConf(module) {
         }
         result = require(module).itfconf();
     } catch (exc) {
-        logj.getLogger('main').error("load-url-err [%s][%s][%s][%s][%s][%s]", module, 
-            exc.name, exc.message, exc.lineNumber, exc.fileName, exc.stack);        
+        logj.strerr("call-loadConf-err", module, exc);        
         result=null;
     }
     return result;
@@ -66,13 +65,12 @@ function renderHtml(rslt, req, res, fld, fle) {
     var name = req.conf.dtpl, html = null, code = 200;
     try {
         if(conf.debug){
-            html = ejs.render(null, {user:req.user,rslt:req.rslt},{cache:false,filename: req.conf.dtpl}); 
+            html = eejs.render(null, {user:req.user,rslt:req.rslt},{cache:false,filename: req.conf.dtpl}); 
         }else{
-            html = ejs.render(null, {user:req.user,rslt:req.rslt},{cache:true,filename: req.conf.dtpl}); 
+            html = eejs.render(null, {user:req.user,rslt:req.rslt},{cache:true,filename: req.conf.dtpl}); 
         }
-    }catch(exc) {
-        logj.getLogger('main').error("load-mod-err [%s] [%s] [%s] [%s] [%s]", 
-            exc.name, exc.message, exc.lineNumber, exc.fileName, exc.stack); 
+    }catch(exc) { 
+        logj.strerr("call-renderHtml-err", name, exc);  
         html = "name: " + exc.name + 
             "message: " + exc.message + 
             "lineNumber: " + exc.lineNumber + 
@@ -99,8 +97,7 @@ exports.loadLast = function loadLast(cfg, req, res, fld, fle) {
         }            
         rslt = require(req.conf.dcfg).itfleft(req, res, fld, fle);
     } catch (exc) {
-        logj.getLogger('main').error("load-url-err [%s] [%s] [%s] [%s] [%s]", 
-            exc.name, exc.message, exc.lineNumber, exc.fileName, exc.stack);        
+        logj.reqerr("call-loadLast-err", req, exc);        
         rslt = exc;
     }
 
@@ -112,5 +109,5 @@ exports.loadLast = function loadLast(cfg, req, res, fld, fle) {
         }
     }
 
-    logj.getLogger('main').info('request url %s %s', req.baseUrl, new Date().getTime()-req.uuid.tim.getTime());
+    logj.info('time compute', req, null);
 }

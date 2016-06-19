@@ -15,7 +15,7 @@ var multiparty = require('multiparty');
 
 var load = require('./sdcm.util.js').loadConf; 
 var last = require('./sdcm.util.js').loadLast;
-var logj = require('./sdcm.logj.js').getLogger;
+var logj = require('./sdcm.logj.js');
 var conf = require('./sdcm.conf.js'); 
 var sock = require('./sdcm.sock.js');
 var iset = require('./sdcm.iset.js');
@@ -23,11 +23,11 @@ var iset = require('./sdcm.iset.js');
 exports = module.exports = function file (req, res, next) {
     if(!iset.set(req, res)) { 
         res.jsonp({"code": -500000,
-            "success": false,
-            "message": '请求配置信息错误'
+            "message": 'enverr',
+            "success": false
         });  
 
-        logj('main').error("file-err0 [%s][%s]", req.baseUrl, new Date().getTime() - req.uuid.tim.getTime());          
+        logj.reqerr("call-file-err0", req, 'enverr');          
         return; 
     }
 
@@ -39,28 +39,14 @@ exports = module.exports = function file (req, res, next) {
                 "message": 'file size exceeded ' + conf.umfs
             }); 
 
-            logj('main').error("file-err1 [%s][%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
-                JSON.stringify(req.uuid), JSON.stringify(err), req.baseUrl);            
+            logj.reqerr("call-file-err1", req, err);            
             return;
         } 
 
-        var cfg = load(req.conf.dcfg); 
-        if(!cfg) {
-            res.jsonp({"code": -800000,
-                "success": false,
-                "message": '请求配置信息错误'
-            });  
-
-            logj('main').error("file-err2 [%s][%s]", req.baseUrl,new Date().getTime() - req.uuid.tim.getTime());              
+        var cfg = sock.loader(req, res, fld, fle);
+        if(!cfg) {              
             return;
-        }
-
-        sock.file(req, res, fld, fle);
-
-        if(!cfg.itfs || cfg.itfs.length <= 0) {
-            last(cfg, req, res, fld, fle);
-            return;
-        }               
+        }                       
 
         var call = []; cfg.itfs.forEach(function(itf){
             req.uuid.max = req.uuid.max + 1; 
@@ -71,8 +57,7 @@ exports = module.exports = function file (req, res, next) {
 
         async.parallel(call, function(err) {
             if (err) {
-                logj('main').error("file-call-err [%s][%s][%s][%s]", new Date().getTime() - req.uuid.tim.getTime(), 
-                    JSON.stringify(err), JSON.stringify(req.uuid), req.baseUrl);
+                logj.reqerr("call-file-err3", req, err);
             }
 
             if(req.uuid.cur >= req.uuid.max){

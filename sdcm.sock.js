@@ -15,7 +15,8 @@ var util = require('util');
 var async = require('async');
 
 var conf = require('./sdcm.conf.js');
-var logj = require('./sdcm.logj.js').getLogger;
+var logj = require('./sdcm.logj.js');
+var load = require('./sdcm.util.js').loadConf;
 var last = require('./sdcm.util.js').loadLast;
 
 var sock = exports = module.exports = {};
@@ -30,8 +31,7 @@ sock.next = function(cfg, itf, req, res, fld, fle,fuc) {
 
     async.parallel(call, function(err) {
         if (err) {
-            logj('main').error("call-sock-err [%s] [%s] [%s]", new Date().getTime() - req.uuid.tim.getTime(),
-                JSON.stringify(req.conf), JSON.stringify(req.uuid));
+            logj.reqerr("call-sock-err", req, err);
         }
 
         if(req.uuid.cur >= req.uuid.max){
@@ -91,7 +91,7 @@ sock.file = function(req,res, fld, fle) {
             ftpClient.on('ready', function() {
                 ftpClient.put(the.path, conf.cftp.path+the.originalFilename, function(err) {
                     if (err) {
-                        logj('main').error("file upload err by [%s]", the.path, JSON.stringify(err));                      
+                        logj.ftperr("call-ftp-err", the.path, err);                      
                     }
 
                     ftpClient.end();
@@ -99,7 +99,7 @@ sock.file = function(req,res, fld, fle) {
 
                     fs.exists(the.path, function (exists) {
                         if(exists){
-                            logj('main').info('ftp suc and delete file [%s]', the.path);
+                            logj.ftperr('ftp suc and delete file', the.path, null);
                             fs.unlink(the.path);
                         }
                     });                             
@@ -197,7 +197,7 @@ sock.code = function(req, res, tex) {
                 });
                 res.write(buffer); 
             }else{
-                logj('main').error("call-code-err [%s]", JSON.stringify(output.headers));          
+                logj.error("call-code-err", req, output.headers['errs']);          
             }
             res.end();
         }); 
@@ -218,4 +218,29 @@ sock.code = function(req, res, tex) {
         object.write(JSON.stringify([tex]));  
     }
     object.end();
+}
+
+
+sock.loadConf = function(req, res, fld, fle) {
+    var cfg = load(req.conf.dcfg);
+    if(!cfg) {
+        res.jsonp({"code": -800000,
+            "message": 'cfgerr',
+            "success": false
+        });  
+
+        logj.reqerr("call-sock-load", req, 'cfgerr');              
+        return null;
+    }
+
+    if(!fle) {
+        this.file(req, res, fld, fle);
+    }
+
+    if(!cfg.itfs || cfg.itfs.length <= 0) {
+        last(cfg, req, res, null,null);
+        return null;
+    }
+    
+    return cfg;
 }
