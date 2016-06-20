@@ -109,5 +109,5 @@ exports.loadLast = function loadLast(cfg, req, res, fld, fle) {
         }
     }
 
-    logj.info('time compute', req, null);
+    logj.reqinf('time compute', req, null);
 }

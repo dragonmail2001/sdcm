@@ -45,19 +45,19 @@ log4js.configure({
 var logj = exports = module.exports = {};
 
 logj.strerr = function(ft, str, err){
-    return log4js.getLogger('main').error(ft+'path=[%s] err=[%s]',
+    return log4js.getLogger('main').error(ft+' path=[%s] err=[%s]',
         str, JSON.stringify(err));
 };
 
 logj.reqerr = function(ft, req, err){
-    return log4js.getLogger('main').error(ft+'url=[%s] time=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
+    return log4js.getLogger('main').error(ft+' url=[%s] time=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
         req.baseUrl, new Date().getTime() - req.uuid.tim.getTime(), JSON.stringify(req.header), 
         JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
         JSON.stringify(err));
 };
 
-logj.info = function(ft, req, err){
-    return log4js.getLogger('main').info(ft+'url=[%s] time=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
+logj.reqinf = function(ft, req, err){
+    return log4js.getLogger('main').info(ft+' url=[%s] time=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
         req.baseUrl, new Date().getTime() - req.uuid.tim.getTime(), JSON.stringify(req.header), 
         JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
         JSON.stringify(err));

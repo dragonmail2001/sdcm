@@ -25,7 +25,8 @@ var config  = {
 	    keepalive: 10000,
 	    path: ""
     },
-    cach:[{
+    cach:[
+        {
             port: 6390,
             host: '192.168.18.243'     
         }, {
@@ -34,12 +35,13 @@ var config  = {
         }, {
             port: 6390,
             host: '192.168.18.248'    
-    }],
+        }
+    ],
     sess:{
         domain: '',
         key: 'sdcm keyboard',
         name: 'sdcm.sid',
-        cluster: true,
+        cluster: false,
         time: 600000                             //10分钟
     },
     code: {
