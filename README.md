@@ -1,6 +1,7 @@
 ﻿# sdcm
 nodejs|top|mtop|service|sdcm|dscm|rpc|ddd data convert matrix
 
+sdcm: service data convert matrix（服务数据转换），用来将组件化服务接口转换为http接口输出，未来可能会对接dobble或者hsf这样的开元中间件
 
 #install
 
