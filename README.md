@@ -1,7 +1,7 @@
 ﻿# sdcm
 nodejs|top|mtop|service|sdcm|dscm|rpc|ddd data convert matrix
 
-sdcm: service data convert matrix（服务数据转换），用来将组件化服务接口转换为http接口输出，未来可能会对接dobble或者hsf这样的开元中间件；
+sdcm: service data convert matrix（服务数据转换），用来将组件化服务接口转换为http接口输出，未来可能会对接dobble或者hsf这样的开源中间件；
 
 dscm：distribute service call matrix（分布式服务调用），包括服务端和客户端，基于spring和netty，用来把普通的spring bean deploy成一个rpc服务；
 
