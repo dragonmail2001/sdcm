@@ -50,15 +50,15 @@ logj.strerr = function(ft, str, err){
 };
 
 logj.reqerr = function(ft, req, err){
-    return log4js.getLogger('main').error(ft+' url=[%s] time=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
-        req.baseUrl, new Date().getTime() - req.uuid.tim.getTime(), JSON.stringify(req.header), 
+    return log4js.getLogger('main').error(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
+        new Date().getTime() - req.uuid.tim.getTime(), req.baseUrl, JSON.stringify(req.header), 
         JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
         JSON.stringify(err));
 };
 
 logj.reqinf = function(ft, req, err){
-    return log4js.getLogger('main').info(ft+' url=[%s] time=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
-        req.baseUrl, new Date().getTime() - req.uuid.tim.getTime(), JSON.stringify(req.header), 
+    return log4js.getLogger('main').info(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
+        new Date().getTime() - req.uuid.tim.getTime(), req.baseUrl, JSON.stringify(req.header), 
         JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
         JSON.stringify(err));
 };
