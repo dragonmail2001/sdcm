@@ -78,11 +78,36 @@ function calfuc(req, fuc, cur, jum, err, msg) {
     fuc(err); 
 }
 
+function allow(filename) {
+    if(filename == null){
+        return false;
+    }
+
+    var pos = filename.lastIndexOf('.');
+    if(pos < 0){
+        return false;
+    }
+
+    try{
+        return conf.fext[filename.substr(pos+1)];
+    }catch(err){
+
+    }
+
+    return false;
+}
+
 sock.file = function(req,res, fld, fle) {
-    req.uuid.upf = 2;
     if(conf.cftp != null) {
         var array = [];
-        for(var the in fle){                 
+        for(var the in fle){  
+            if(!allow(fle[the][0].originalFilename)) {
+                res.jsonp({"code": -300000,
+                    "message": 'fileerr',
+                    "success": false
+                }); 
+                return false;
+            }           
             array.push(fle[the][0]);
         }   
 
@@ -91,7 +116,7 @@ sock.file = function(req,res, fld, fle) {
             ftpClient.on('ready', function() {
                 ftpClient.put(the.path, conf.cftp.path+the.originalFilename, function(err) {
                     if (err) {
-                        logj.ftperr("call-ftp-err", the.path, err);                      
+                        logj.strerr("call-ftp-err", the.path, err);                      
                     }
 
                     ftpClient.end();
@@ -99,7 +124,6 @@ sock.file = function(req,res, fld, fle) {
 
                     fs.exists(the.path, function (exists) {
                         if(exists){
-                            logj.ftperr('ftp suc and delete file', the.path, null);
                             fs.unlink(the.path);
                         }
                     });                             
@@ -108,6 +132,8 @@ sock.file = function(req,res, fld, fle) {
             ftpClient.connect(conf.cftp);  
         }); 
     }
+
+    return true;
 }
 
 sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
@@ -233,8 +259,8 @@ sock.loader = function(req, res, fld, fle) {
         return null;
     }
 
-    if(!fle) {
-        this.file(req, res, fld, fle);
+    if(fle != null && !this.file(req, res, fld, fle)) {
+        return null;
     }
 
     if(!cfg.itfs || cfg.itfs.length <= 0) {

@@ -16,7 +16,12 @@ var config  = {
     timeout: 20000,
     umfs: 2097152,                                   //上传文件总大小上限2m(2 * 1024 * 1024)
     debug: true, 
-    ldir: '/Workspace/cloudy/logs',                  //日志文件目录    
+    ldir: '/Workspace/cloudy/logs',                  //日志文件目录  
+    fext: {
+        'jpg': true,
+        'jpeg': true,
+        'png': true
+    },  
     cftp:{
 	    host: "192.168.18.248",
 	    port: 21,
@@ -41,7 +46,7 @@ var config  = {
         domain: '',
         key: 'sdcm keyboard',
         name: 'sdcm.sid',
-        cluster: false,
+        cluster: true,
         time: 600000                             //10分钟
     },
     code: {
