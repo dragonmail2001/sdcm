@@ -15,7 +15,11 @@ npm info underscore （如果上面配置正确这个命令会有字符串respon
 
 NODE_PATH  系统需要设置NodeJS环境变量
 
+//log4js全局安装
 npm install log4js@0.6.26 -g
+
+//安装sdcm
+npm install
 
 ###############################################################
 #配置文件说明
