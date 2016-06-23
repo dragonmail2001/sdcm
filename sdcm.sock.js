@@ -78,7 +78,7 @@ function calfuc(req, fuc, cur, jum, err, msg) {
     fuc(err); 
 }
 
-function allow(filename) {
+sock.allow = function(filename) {
     if(filename == null){
         return false;
     }
@@ -97,6 +97,14 @@ function allow(filename) {
     return false;
 }
 
+sock.remove = function(path) {
+    fs.exists(the.path, function (exists) {
+        if(exists){
+            fs.unlink(the.path);
+        }
+    });   
+}
+
 sock.file = function(req,res, fld, fle) {
     if(conf.cftp != null) {
         var array = [];
@@ -106,6 +114,8 @@ sock.file = function(req,res, fld, fle) {
                     "message": 'fileerr',
                     "success": false
                 }); 
+
+                remove(fle[the][0].path);
                 return false;
             }           
             array.push(fle[the][0]);
@@ -122,11 +132,7 @@ sock.file = function(req,res, fld, fle) {
                     ftpClient.end();
                     ftpClient.destroy();
 
-                    fs.exists(the.path, function (exists) {
-                        if(exists){
-                            fs.unlink(the.path);
-                        }
-                    });                             
+                    remove(the.path);                             
                 });
             });         
             ftpClient.connect(conf.cftp);  
