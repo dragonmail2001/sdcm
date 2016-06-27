@@ -32,6 +32,11 @@ var config  = {
     timeout: 20000,                                  //调用后端服务的超时时间，单位ms
     umfs: 2097152,                                   //上传文件总大小上限2m(2 * 1024 * 1024)
     debug: true,                                     //是否运行在debug模式，如果是开发环境建议设置成true(*.cfg *.ejs不会缓存便于开发)否则设置成false，
+    fext: {
+        'jpg': true,
+        'jpeg': true,
+        'png': true
+    },      
     ldir: '/Workspace/cloudy/logs',                  //日志文件目录    
     cftp:{                                           //后端ftp服务设置，用户上传的文件会上传到ftp服务
 	    host: "192.168.18.248",
