@@ -176,7 +176,8 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
                 }
             }else{
                 req.rslt[itf.uuid]=null;
-	            calfuc(req, fuc, req.uuid.cur + 1, false, true, output.headers);            
+	            calfuc(req, fuc, req.uuid.cur + 1, false, true, output.headers);  
+                logj.strerr("call-dscm-err", option.path, body);            
             }
          }); 
      });    
@@ -231,7 +232,7 @@ sock.code = function(req, res, tex) {
                 });
                 res.write(buffer); 
             }else{
-                logj.error("call-code-err", req, output.headers['errs']);          
+                logj.strerr("call-code-err", conf.code.path, body);          
             }
             res.end();
         }); 
