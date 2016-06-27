@@ -116,6 +116,8 @@ sock.file = function(req,res, fld, fle) {
                 }); 
 
                 remove(fle[the][0].path);
+
+                logj.strerr("call-ftp-err1", fle[the][0].path, null); 
                 return false;
             }           
             array.push(fle[the][0]);
@@ -126,7 +128,7 @@ sock.file = function(req,res, fld, fle) {
             ftpClient.on('ready', function() {
                 ftpClient.put(the.path, conf.cftp.path+the.originalFilename, function(err) {
                     if (err) {
-                        logj.strerr("call-ftp-err", the.path, err);                      
+                        logj.strerr("call-ftp-err2", the.path, err);                      
                     }
 
                     ftpClient.end();
