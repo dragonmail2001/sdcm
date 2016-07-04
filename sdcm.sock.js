@@ -78,7 +78,7 @@ function calfuc(req, fuc, cur, jum, err, msg) {
     fuc(err); 
 }
 
-sock.allow = function(filename) {
+function allow(filename) {
     if(filename == null){
         return false;
     }
@@ -97,10 +97,10 @@ sock.allow = function(filename) {
     return false;
 }
 
-sock.remove = function(path) {
-    fs.exists(the.path, function (exists) {
+function remove(path) {
+    fs.exists(path, function (exists) {
         if(exists){
-            fs.unlink(the.path);
+            fs.unlink(path);
         }
     });   
 }

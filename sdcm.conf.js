@@ -32,8 +32,8 @@ var config  = {
     },
     cach:[
         {
-            port: 6390,
-            host: '192.168.18.243'     
+            port: 6379,
+            host: '192.168.165.155'     
         }, {
             port: 6390,
             host: '192.168.18.244'
@@ -46,7 +46,7 @@ var config  = {
         domain: '',
         key: 'sdcm keyboard',
         name: 'sdcm.sid',
-        cluster: true,
+        cluster: false,
         time: 600000                             //10分钟
     },
     code: {
@@ -60,7 +60,7 @@ var config  = {
         //type: 'http'
     }, 
     fdir:'/Workspace/cloudy/fdir',                 //前端上传文件保存的临时目录
-    dcfg:'/Workspace/cloudy/work'                 //前端请求资源文件本地存放路径
+    dcfg:'/Workspace/cloudy/cloudy-sdcm/webapp'                 //前端请求资源文件本地存放路径
 };
 
 module.exports = config;
