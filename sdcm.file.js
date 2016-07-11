@@ -43,11 +43,6 @@ exports = module.exports = function file (req, res, next) {
             return;
         } 
 
-        var cfg = sock.loader(req, res, fld, fle);
-        if(!cfg) {              
-            return;
-        }                       
-
         var call = []; cfg.itfs.forEach(function(itf){
             req.uuid.max = req.uuid.max + 1; 
             call.push(function(fuc) {     
