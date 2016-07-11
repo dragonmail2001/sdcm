@@ -146,7 +146,7 @@ sock.file = function(req,res, fld, fle) {
 
 sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
     var param = itf.func (req, res, fld, fle);
-    if(!sock.loader(req, res, fld, fle)) { 
+    if(!this.loader(req, res, fld, fle)) { 
         calfuc(req, fuc, req.uuid.cur + 1, true, false, 
             'cfg.itf.func ftp err');                 
         return;
