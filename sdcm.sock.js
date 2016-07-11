@@ -105,24 +105,31 @@ function remove(path) {
     });   
 }
 
-sock.file = function(req,res, fld, fle) {
+sock.chck = function(fle) {
+    var array = []; if(fle == null) {
+        return array;
+    }
+
+    for(var the in fle){  
+        if(!allow(fle[the][0].originalFilename)) {
+            res.jsonp({"code": -300000,
+                "message": 'fileerr',
+                "success": false
+            }); 
+
+            remove(fle[the][0].path);
+
+            logj.strerr("call-ftp-err1", fle[the][0].path, null); 
+            return null;
+        }           
+        array.push(fle[the][0]);
+    } 
+
+    return array;
+}
+
+sock.file = function(array) {
     if(conf.cftp != null) {
-        var array = [];
-        for(var the in fle){  
-            if(!allow(fle[the][0].originalFilename)) {
-                res.jsonp({"code": -300000,
-                    "message": 'fileerr',
-                    "success": false
-                }); 
-
-                remove(fle[the][0].path);
-
-                logj.strerr("call-ftp-err1", fle[the][0].path, null); 
-                return false;
-            }           
-            array.push(fle[the][0]);
-        }   
-
         array.forEach(function(the){
             var ftpClient = new ftp();  
             ftpClient.on('ready', function() {
@@ -145,13 +152,15 @@ sock.file = function(req,res, fld, fle) {
 }
 
 sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
-    var param = itf.func (req, res, fld, fle);
-    if(fle != null && !this.file(req, res, fld, fle)) {
-        calfuc(req, fuc, req.uuid.cur + 1, true, false, 
-            'cfg.itf.func ftp err');                 
-        return;
-    }    
+    var array = this.chck(fle);
+    if(array == null) {
+        calfuc(req, fuc, req.uuid.cur + 1, false, false, 
+            'cfg.itf.func ftp err');   
+        return true;
+    }
 
+    var param = itf.func (req, res, fld, fle);
+    this.file(array);
     if(!param || this.isBrace(param)) { 
         calfuc(req, fuc, req.uuid.cur + 1, true, false, 
         	'cfg.itf.func return err');
