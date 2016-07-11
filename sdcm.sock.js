@@ -129,7 +129,7 @@ sock.chck = function(fle) {
 }
 
 sock.file = function(array) {
-    if(conf.cftp != null) {
+    if(conf.cftp != null && array.length > 0) {
         array.forEach(function(the){
             var ftpClient = new ftp();  
             ftpClient.on('ready', function() {
