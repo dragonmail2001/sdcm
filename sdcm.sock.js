@@ -283,7 +283,7 @@ sock.load = function(req, res, fld, fle) {
     }
 
     if(!cfg.itfs || cfg.itfs.length <= 0) {
-        last(cfg, req, res, null,null);
+        last(cfg, req, res, fld,fle);
         return null;
     }  
 

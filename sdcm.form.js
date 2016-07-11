@@ -30,7 +30,7 @@ exports = module.exports = function form(req, res, next) {
         return; 
     }
 
-    var cfg = sock.loader(req, res, fld, fle);
+    var cfg = sock.loader(req, res, null, null);
     if(!cfg) {              
         return;
     }      
