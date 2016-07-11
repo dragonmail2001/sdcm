@@ -30,10 +30,21 @@ exports = module.exports = function form(req, res, next) {
         return; 
     }
 
-    var cfg = sock.loader(req, res);
-    if(!cfg) {              
-        return;
-    } 
+    var cfg = load(req.conf.dcfg);
+    if(!cfg) {
+        res.jsonp({"code": -800000,
+            "message": 'cfgerr',
+            "success": false
+        });  
+
+        logj.reqerr("call-file-err4", req, 'cfgerr');              
+        return null;
+    }
+
+    if(!cfg.itfs || cfg.itfs.length <= 0) {
+        last(cfg, req, res, null,null);
+        return null;
+    }  
 
     var call = []; cfg.itfs.forEach (function (itf) {
         req.uuid.max = req.uuid.max + 1; 

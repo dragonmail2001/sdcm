@@ -146,11 +146,11 @@ sock.file = function(req,res, fld, fle) {
 
 sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
     var param = itf.func (req, res, fld, fle);
-    if(!this.loader(req, res, fld, fle)) { 
+    if(fle != null && !this.file(req, res, fld, fle)) {
         calfuc(req, fuc, req.uuid.cur + 1, true, false, 
             'cfg.itf.func ftp err');                 
         return;
-    } 
+    }    
 
     if(!param || this.isBrace(param)) { 
         calfuc(req, fuc, req.uuid.cur + 1, true, false, 
@@ -259,29 +259,4 @@ sock.code = function(req, res, tex) {
         object.write(JSON.stringify([tex]));  
     }
     object.end();
-}
-
-
-sock.loader = function(req, res, fld, fle) {
-    var cfg = load(req.conf.dcfg);
-    if(!cfg) {
-        res.jsonp({"code": -800000,
-            "message": 'cfgerr',
-            "success": false
-        });  
-
-        logj.reqerr("call-sock-load", req, 'cfgerr');              
-        return null;
-    }
-
-    if(fle != null && !this.file(req, res, fld, fle)) {
-        return null;
-    }
-
-    if(!cfg.itfs || cfg.itfs.length <= 0) {
-        last(cfg, req, res, null,null);
-        return null;
-    }
-    
-    return cfg;
 }
