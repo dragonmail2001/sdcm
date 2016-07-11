@@ -260,3 +260,23 @@ sock.code = function(req, res, tex) {
     }
     object.end();
 }
+
+sock.load = function(req, res, fld, fle) {
+    var cfg = load(req.conf.dcfg);
+    if(!cfg) {
+        res.jsonp({"code": -800000,
+            "message": 'cfgerr',
+            "success": false
+        });  
+
+        logj.reqerr("call-file-err4", req, 'cfgerr');              
+        return null;
+    }
+
+    if(!cfg.itfs || cfg.itfs.length <= 0) {
+        last(cfg, req, res, null,null);
+        return null;
+    }  
+
+    return cfg;    
+}
