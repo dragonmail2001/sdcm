@@ -270,7 +270,7 @@ sock.code = function(req, res, tex) {
     object.end();
 }
 
-sock.load = function(req, res, fld, fle) {
+sock.loader = function(req, res, fld, fle) {
     var cfg = load(req.conf.dcfg);
     if(!cfg) {
         res.jsonp({"code": -800000,
