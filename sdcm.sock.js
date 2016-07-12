@@ -156,7 +156,7 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
     if(array == null) {
         calfuc(req, fuc, req.uuid.cur + 1, false, false, 
             'cfg.itf.func ftp err');   
-        return true;
+        return;
     }
 
     var param = itf.func (req, res, fld, fle);
