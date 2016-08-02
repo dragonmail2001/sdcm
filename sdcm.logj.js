@@ -45,30 +45,27 @@ log4js.configure({
 var logj = exports = module.exports = {};
 
 logj.strerr = function(ft, str, err){
-    return log4js.getLogger('main').error(ft+' path=[%s] err=[%s][%s][%s]', str, 
-        !err ? '' : err.lineNumber, 
-        !err ? '' : err.message, 
-        !err ? '' : err.name);
+    return log4js.getLogger('main').error(ft + ' path=[%s] err=[%s][%s][%s]', str, 
+        !err ? '' : err.lineNumber,!err ? '' : err.message,!err ? '' : err.name);
 };
 
 logj.reqerr = function(ft, req, err){
     return log4js.getLogger('main').error(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s %s %s]', 
         new Date().getTime() - req.uuid.tim.getTime(), req.baseUrl, JSON.stringify(req.header), 
         JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
-        !err ? '' : err.lineNumber, 
-        !err ? '' : err.message, 
-        !err ? '' : err.name);
+        !err ? '' : err.lineNumber, !err ? '' : err.message, !err ? '' : err.name);
 };
 
 logj.reqinf = function(ft, req, err){
     var waste = new Date().getTime() - req.uuid.tim.getTime();
-    if(waste > 10){    
+    if(waste > 10){  
+        Object.defineProperty(req.params, "password", { enumerable: false });
+        Object.defineProperty(req.body, "password", { enumerable: false });
+        Object.defineProperty(req.query, "password", { enumerable: false });  
         return log4js.getLogger('main').info(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s %s %s]', 
             new Date().getTime() - req.uuid.tim.getTime(), req.baseUrl, JSON.stringify(req.header), 
             JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
-            !err ? '' : err.lineNumber, 
-            !err ? '' : err.message, 
-            !err ? '' : err.name);
+            !err ? '' : err.lineNumber, !err ? '' : err.message, !err ? '' : err.name);
     }
 };
 
