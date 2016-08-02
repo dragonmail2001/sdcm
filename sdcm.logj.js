@@ -45,22 +45,31 @@ log4js.configure({
 var logj = exports = module.exports = {};
 
 logj.strerr = function(ft, str, err){
-    return log4js.getLogger('main').error(ft+' path=[%s] err=[%s][%s][%s]',
-        str, err.message, err.lineNumber, err.name);
+    return log4js.getLogger('main').error(ft+' path=[%s] err=[%s][%s][%s]', str, 
+        !err ? '' : err.lineNumber, 
+        !err ? '' : err.message, 
+        !err ? '' : err.name);
 };
 
 logj.reqerr = function(ft, req, err){
-    return log4js.getLogger('main').error(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
+    return log4js.getLogger('main').error(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s %s %s]', 
         new Date().getTime() - req.uuid.tim.getTime(), req.baseUrl, JSON.stringify(req.header), 
         JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
-        JSON.stringify(err));
+        !err ? '' : err.lineNumber, 
+        !err ? '' : err.message, 
+        !err ? '' : err.name);
 };
 
 logj.reqinf = function(ft, req, err){
-    return log4js.getLogger('main').info(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
-        new Date().getTime() - req.uuid.tim.getTime(), req.baseUrl, JSON.stringify(req.header), 
-        JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
-        JSON.stringify(err));
+    var waste = new Date().getTime() - req.uuid.tim.getTime();
+    if(waste > 10){    
+        return log4js.getLogger('main').info(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s %s %s]', 
+            new Date().getTime() - req.uuid.tim.getTime(), req.baseUrl, JSON.stringify(req.header), 
+            JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
+            !err ? '' : err.lineNumber, 
+            !err ? '' : err.message, 
+            !err ? '' : err.name);
+    }
 };
 
 logj.logger = function(){
