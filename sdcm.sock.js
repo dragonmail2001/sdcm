@@ -159,8 +159,10 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
         return;
     }
 
-    var param = itf.func (req, res, fld, fle);
+    var param = itf.func (req, res, fld, fle); 
+
     this.file(array);
+    
     if(!param || this.isBrace(param)) { 
         calfuc(req, fuc, req.uuid.cur + 1, true, false, 
         	'cfg.itf.func return err');
@@ -289,3 +291,21 @@ sock.loader = function(req, res, fld, fle) {
 
     return cfg;    
 }
+
+/*
+sock.parser = function(req, res, next) {
+    var data = [], size = 0;
+    req.on('data', function (dat) {
+        data.push(dat);
+        size += dat.length;
+    });
+
+    req.on('end', function () {
+        req.data = Buffer.concat(data, size);
+        //npm install xml2json
+        //var xml2json=require('xml2json');
+        //json=xml2json.toJson(req.rawBody);
+    });
+
+    next();    
+}*/

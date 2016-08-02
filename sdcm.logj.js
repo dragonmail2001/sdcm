@@ -45,8 +45,8 @@ log4js.configure({
 var logj = exports = module.exports = {};
 
 logj.strerr = function(ft, str, err){
-    return log4js.getLogger('main').error(ft+' path=[%s] err=[%s]',
-        str, JSON.stringify(err));
+    return log4js.getLogger('main').error(ft+' path=[%s] err=[%s][%s][%s]',
+        str, err.message, err.lineNumber, err.name);
 };
 
 logj.reqerr = function(ft, req, err){

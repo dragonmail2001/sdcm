@@ -30,6 +30,7 @@ iset.set = function(req, res) {
     req.uuid.jum = false;
     req.uuid.moc = false;
     req.uuid.tim = new Date();
+    req.uuid.app = '';
 
     req.conf.btpl = false;
 
@@ -45,6 +46,8 @@ iset.set = function(req, res) {
         });
         return false;
     } 
+
+    if(cctx.length > 2) { req.uuid.app = cctx[1]; }
 
     req.conf.name = getContextName(cctx[cctx.length-1]);
     cctx.splice(cctx.length-1, 1);

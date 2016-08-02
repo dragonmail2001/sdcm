@@ -40,8 +40,13 @@ function createSdcmObject() {
         }
     }));
     app.use(cookieParser(conf.sess.key));
-    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.urlencoded({ 
+        extended: true 
+    }));
     app.use(bodyParser.json());
+    app.use(bodyParser.raw({ 
+        type: 'text/xml'
+    }));
     app.use('*.cci', code);
     app.use('*.cgi', form);
     app.use('*.cfi', file);
