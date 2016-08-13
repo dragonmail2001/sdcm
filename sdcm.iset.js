@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright 2015-2115 the original author or authors.
  *
  * Licensed under the MIT Licensed
@@ -6,6 +6,7 @@
  * @email   dragonmail2001@163.com
  * @author  jinglong.zhaijl
  * @date    2015-10-24
+ * @Source: https://github.com/dragonmail2001
  *
  */
 var getContextName = require('./sdcm.util.js').getContextName; 
