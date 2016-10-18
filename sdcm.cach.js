@@ -11,6 +11,8 @@
  */
 var conf = require('./sdcm.conf.js');  
 var ioredis = require('ioredis'); 
+var session = require('express-session');
+var wildcard = require('wildcard2');
 var util = require("util"); 
 var noop = function(){};
 
@@ -21,7 +23,7 @@ function getTTL(store, sess) {
     : 86400); //oneDay
 }
 
-module.exports = function (session) {
+module.exports = function () {
 
     var Store = session.Store;
     var cluster = null;//new ioredis.Cluster(conf.cach);    
@@ -115,6 +117,21 @@ module.exports = function (session) {
             if (er) return fn(er);
             fn.apply(this, arguments);
         });
+    };
+
+    CachStore.prototype.replaceGenerate = function (domains) {
+        var old = this.generate.bind(this);
+        this.generate = function (req) {
+            old(req);
+
+            var host = req.headers.host;
+            for (let [key, value] of conf.sess.domain) {
+                if (wildcard(host, key)) {
+                    req.session.cookie.domain = value;
+                    break;
+                }
+            }
+        };
     };
 
     return CachStore;

@@ -57,7 +57,10 @@ var config  = {
             host: '192.168.18.248'    
     }],
     sess:{                                          //session相关的参数设置，建议整站用一个顶级域名，方便session管理
-        domain: '',
+        domain: [
+            ["*.abc.com", ".abc.com"],
+            ["*.abc.com:*", ".abc.com"],//开发环境
+        ],
         key: 'sdcm keyboard',
         name: 'sdcm.sid',
         cluster: true,                              //redis是否要集群

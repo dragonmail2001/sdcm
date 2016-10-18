@@ -25,21 +25,27 @@ var file = require('./sdcm.file.js');
 var html = require('./sdcm.html.js');
 
 var numCPUs = require('os').cpus().length;
-var cach = require('./sdcm.cach.js')(session);
+var cach = require('./sdcm.cach.js')();
 
 function createSdcmObject() {
     var app = express();
+    // Set case sensitive routing for Windows development environment.
+    if (conf.debug)
+        app.set('case sensitive routing', true);
+
+    var cache = new cach(conf.cach);
     app.use(session({
-        store: new cach(conf.cach),        
+        store: cache,
         saveUninitialized: false,
         secret: conf.sess.key,
         name: conf.sess.name,
-        resave:true,
+        resave: true,
         cookie: {
-            domain: conf.sess.domain,
             maxAge: conf.sess.time
         }
     }));
+    cache.replaceGenerate();
+
     app.use(cookieParser(conf.sess.key));
     app.use(bodyParser.urlencoded({ 
         extended: true 

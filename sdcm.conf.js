@@ -17,7 +17,7 @@ var config  = {
     timeout: 20000,
     umfs: 2097152,                                   //上传文件总大小上限2m(2 * 1024 * 1024)
     debug: true, 
-    ldir: '/Workspace/cloudy/logs',                  //日志文件目录  
+    ldir: 'D:/dev/webfile/logger',                  //日志文件目录  
     fext: {
         'jpg': true,
         'jpeg': true,
@@ -31,40 +31,40 @@ var config  = {
 	    keepalive: 10000,
 	    path: ""
     },
-    cach:[
-        {
-            port: 6379,
-            host: '127.0.0.1'     
+    cach:[{
+            port: 6390,
+            host: '192.168.18.205'     
         }, {
             port: 6390,
-            host: '192.168.18.244'     
+            host: '192.168.18.206'
         }, {
             port: 6390,
-            host: '192.168.18.244'
-        }, {
-            port: 6390,
-            host: '192.168.18.248'    
+            host: '192.168.18.207'    
         }
     ],
     sess:{
-        domain: '',
+        //domain: '.cnaidai.com',
+        domain: [
+            ["*.abc.com", ".abc.com"],
+            ["*.abc.com:*", ".abc.com"],//开发环境
+            ["*.cnaidai.com", ".cnaidai.com"],
+            ["*.cnaidai.com:*", ".cnaidai.com"],//开发环境
+            ["*.laixiangke.com", ".laixiangke.com"],
+            ["*.laixiangke.com:*", ".laixiangke.com"]//开发环境
+        ],
         key: 'sdcm keyboard',
         name: 'sdcm.sid',
-        cluster: false,
+        cluster: true,
         time: 600000                             //10分钟
     },
     code: {
         path: '/verifyService?actn=code',
         hostname: '192.168.18.198',
         port: '5524',
-        type: 'dscm'        
-        //path: '/admin-web/admin/common/captcha.cgi',
-        //hostname: '192.168.18.198',
-        //port: '8001',
-        //type: 'http'
+        type: 'dscm'
     }, 
-    fdir:'/Workspace/cloudy/fdir',                 //前端上传文件保存的临时目录
-    dcfg:'/Workspace/cloudy/cloudy-sdcm/webapp'                 //前端请求资源文件本地存放路径
+    fdir:'D:/dev/webfile/upload',                 //前端上传文件保存的临时目录
+    dcfg:'D:/dev/webroot'                 //前端请求资源文件本地存放路径
 };
 
 module.exports = config;
