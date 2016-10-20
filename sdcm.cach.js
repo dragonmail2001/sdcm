@@ -125,9 +125,9 @@ module.exports = function () {
             old(req);
 
             var host = req.headers.host;
-            for (let [key, value] of conf.sess.domain) {
-                if (wildcard(host, key)) {
-                    req.session.cookie.domain = value;
+            for (var pair of conf.sess.domain) {
+                if (wildcard(host, pair[0])) {
+                    req.session.cookie.domain = pair[1];
                     break;
                 }
             }
