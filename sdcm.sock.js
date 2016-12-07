@@ -26,7 +26,7 @@ sock.next = function(cfg, itf, req, res, fld, fle,fuc) {
     var call = []; itf.forEach(function(citf){
         req.uuid.max = req.uuid.max + 1; 
         call.push(function(func) {          
-            this.request(cfg, itf, req, res, fld, fle, fuc);
+            sock.request(cfg, citf, req, res, fld, fle, fuc);
         });
     });
 
@@ -50,7 +50,7 @@ sock.next = function(cfg, itf, req, res, fld, fle,fuc) {
 sock.prepare = function (citf, param, user) {
      var options = {hostname: citf.host, port: citf.port, path: citf.iurl, method: citf.meth,headers:null};
      options.headers={'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8','user':user};
-     if(citf.meth.toUpperCase() == 'GET' && itf.type=='http'){
+     if(citf.meth.toUpperCase() == 'GET' && citf.type=='http'){
         options.path = citf.iurl+"?"+qs.stringify(param);    
      }else if(citf.type != 'http') {
         options.headers={'claz':param.claz};
@@ -153,7 +153,7 @@ sock.file = function(array) {
 }
 
 sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
-    var array = this.chck(fle);
+    var array = sock.chck(fle);
     if(array == null) {
         calfuc(req, fuc, req.uuid.cur + 1, false, false, 
             'cfg.itf.func ftp err');   
@@ -162,16 +162,16 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
 
     var param = itf.func (req, res, fld, fle); 
 
-    this.file(array);
+    sock.file(array);
     
-    if(!param || this.isBrace(param)) { 
+    if(!param || !param.claz || sock.isBrace(param)) { 
         calfuc(req, fuc, req.uuid.cur + 1, true, false, 
         	'cfg.itf.func return err');
         return; 
     }
 
     var body = '',sody = null;
-    var option = this.prepare (itf, param, req.user);
+    var option = sock.prepare (itf, param, req.user);
     var object = http.request(option, function(output){
          output.setEncoding('utf8');
          output.on('data',function(d){
@@ -188,7 +188,7 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
                 req.rslt[itf.uuid] = sody ;
                 req.uuid.cur = req.uuid.cur + 1;
                 if(!req.uuid.err && itf.next && itf.next.length > 0){
-                    this.next(cfg, itf.next, req, res, fld, fle,fuc);
+                    sock.next(cfg, itf.next, req, res, fld, fle, fuc);
                 }else{
                     fuc(false);
                 }
