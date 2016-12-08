@@ -13,7 +13,7 @@ var path = require('path');
 
 var config  = {   
     cluster: false,
-    httpport: 8001,
+    httpport: 80,
     timeout: 20000,
     umfs: 2097152,                                   //上传文件总大小上限2m(2 * 1024 * 1024)
     debug: true, 
@@ -42,6 +42,17 @@ var config  = {
             host: '192.168.18.207'    
         }
     ],
+    acl:{
+        "webpc":{
+            allow:["*.cnaidai.com"],
+            deny:["webshop.cnaidai.com"]
+        }
+        // ,
+        // "webchat":{
+        //     allow:["wechat.cnaidai.com"],
+        //     deny:["wechat.cnaidai.com"]
+        // }
+    },
     sess:{
         //domain: '.cnaidai.com',
         domain: [

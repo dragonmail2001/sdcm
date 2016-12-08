@@ -35,8 +35,26 @@ var config  = {
             port: 6390,
             host: '192.168.18.248'    
     }],
+    acl:{
+        "webpc":{
+            allow:["*.cnaidai.com"],
+            deny:["webshop.cnaidai.com"]
+        }
+        // ,
+        // "webchat":{
+        //     allow:["wechat.cnaidai.com"],
+        //     deny:["wechat.cnaidai.com"]
+        // }
+    },
     sess:{
-        domain: '',
+        domain: [
+            ["*.abc.com", ".abc.com"],
+            ["*.abc.com:*", ".abc.com"],//开发环境
+            ["*.cnaidai.com", ".cnaidai.com"],
+            ["*.cnaidai.com:*", ".cnaidai.com"],//开发环境
+            ["*.laixiangke.com", ".laixiangke.com"],
+            ["*.laixiangke.com:*", ".laixiangke.com"]//开发环境
+        ],
         key: 'sdcm keyboard',
         name: 'sdcm.sid',
         time: 600000                             //10分钟

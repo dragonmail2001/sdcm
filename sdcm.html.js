@@ -13,6 +13,8 @@ var ejs = require('./sdcm.eejs.js');
 var iset = require('./sdcm.iset.js');
 var conf = require('./sdcm.conf.js');
 var logj = require('./sdcm.logj.js');
+var fs = require("fs");
+var path = require("path");
 
 exports = module.exports = function html(req, res, next) {
     if(!iset.set(req, res)) {
@@ -33,18 +35,41 @@ exports = module.exports = function html(req, res, next) {
             html = ejs.render(null, {user:req.user,rslt:req.rslt},
                 {cache:true,filename: req.conf.dtpl});
         }
+        res.writeHead(200, {
+          'Content-Length': new Buffer(html+"",'utf-8').length,
+          'Content-Type': 'text/html;encode=UTF-8'
+        });
+        res.end(html);
     }catch(exc) {
-        html = "name: " + exc.name + "message: " + exc.message +
-            "lineNumber: " + exc.lineNumber + "fileName: " + exc.fileName +
-            "stack: " + exc.stack;
+        if(conf.debug){
+            html = "name: " + exc.name + "message: " + exc.message +
+                "lineNumber: " + exc.lineNumber + "fileName: " + exc.fileName +
+                "stack: " + exc.stack;
+            res.end(html);
+        } else {
+            res.status(404);
+            var folder = (req.baseUrl+"").split("/")[1];
+            var test = path.resolve(conf.dcfg, folder, "404.html")+"";
+            fs.access(test, fs.F_OK, function (err) {
+                if (!err) {
+                    res.sendFile(test);
+                    return;
+                }
+                test = path.resolve(conf.dcfg, folder, "404.htm")+"";
+                fs.access(test, fs.F_OK, function (err) {
+                    if (!err) {
+                        html = ejs.render(null, {user:req.user,rslt:req.rslt},{cache:true,filename: test})+"";
+                        res.end(html);
+                    } else if (conf.notFound) {
+                        res.sendFile(conf.notFound);
+                    } else {
+                        res.status(404).send("请求的资源不存在");
+                    }
+                });
+            });
+        }
 
         logj.reqerr("call-html-err1", req, exc);
     }
-
-    res.writeHead(200, {
-      'Content-Length': new Buffer(html,'utf-8').length,
-      'Content-Type': 'text/html;encode=UTF-8'
-    });
-    res.end(html);
 };
 

@@ -34,8 +34,8 @@ exports = module.exports = function form(req, res, next) {
     var cfg = sock.loader(req, res, null, null);
     if(!cfg) {              
         return;
-    }      
-
+    }
+    
     var call = []; cfg.itfs.forEach (function (itf) {
         req.uuid.max = req.uuid.max + 1; 
         call.push(function(fuc) {  

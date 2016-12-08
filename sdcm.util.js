@@ -95,7 +95,7 @@ exports.loadLast = function loadLast(cfg, req, res, fld, fle) {
     try {
         if(conf.debug) {
             delete require.cache[require.resolve(req.conf.dcfg)];
-        }            
+        }
         rslt = require(req.conf.dcfg).itfleft(req, res, fld, fle);
     } catch (exc) {
         logj.reqerr("call-loadLast-err", req, exc);        
@@ -109,6 +109,5 @@ exports.loadLast = function loadLast(cfg, req, res, fld, fle) {
             res.jsonp(rslt);
         }
     }
-
     logj.reqinf('time compute', req, null);
 }

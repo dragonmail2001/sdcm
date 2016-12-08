@@ -46,15 +46,13 @@ log4js.configure({
 var logj = exports = module.exports = {};
 
 logj.strerr = function(ft, str, err){
-    return log4js.getLogger('main').error(ft + ' path=[%s] err=[%s][%s][%s]', str, 
-        !err ? '' : err.lineNumber,!err ? '' : err.message,!err ? '' : err.name);
+    return log4js.getLogger('main').error(ft + ' path=[%s] err=[%s]', str, !err ? '' : err.toString());
 };
 
 logj.reqerr = function(ft, req, err){
-    return log4js.getLogger('main').error(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s %s %s]', 
-        new Date().getTime() - req.uuid.tim.getTime(), req.baseUrl, JSON.stringify(req.header), 
-        JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
-        !err ? '' : err.lineNumber, !err ? '' : err.message, !err ? '' : err.name);
+    return log4js.getLogger('main').error(ft+' time=[%s] method=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
+        new Date().getTime() - req.uuid.tim.getTime(), req.method, req.baseUrl, JSON.stringify(req.headers), 
+        JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query), !err ? '' : err.toString());
 };
 
 logj.reqinf = function(ft, req, err){
@@ -63,10 +61,10 @@ logj.reqinf = function(ft, req, err){
         Object.defineProperty(req.params, "password", { enumerable: false });
         Object.defineProperty(req.body, "password", { enumerable: false });
         Object.defineProperty(req.query, "password", { enumerable: false });  
-        return log4js.getLogger('main').info(ft+' time=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s %s %s]', 
-            new Date().getTime() - req.uuid.tim.getTime(), req.baseUrl, JSON.stringify(req.header), 
-            JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
-            !err ? '' : err.lineNumber, !err ? '' : err.message, !err ? '' : err.name);
+        return log4js.getLogger('main').info(ft+' time=[%s] method=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
+            new Date().getTime() - req.uuid.tim.getTime(), req.method, req.baseUrl, JSON.stringify(req.headers), 
+            JSON.stringify(req.params), req.body, JSON.stringify(req.query),
+            !err ? '' : err.toString());
     }
 };
 

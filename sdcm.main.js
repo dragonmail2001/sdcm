@@ -23,6 +23,7 @@ var code = require('./sdcm.code.js');
 var form = require('./sdcm.form.js');
 var file = require('./sdcm.file.js');
 var html = require('./sdcm.html.js');
+var acl = require('./sdcm.acl.js');
 
 var numCPUs = require('os').cpus().length;
 var cach = require('./sdcm.cach.js')();
@@ -54,10 +55,10 @@ function createSdcmObject() {
     app.use(bodyParser.raw({ 
         type: 'text/xml'
     }));
-    app.use('*.cci', code);
-    app.use('*.cgi', form);
-    app.use('*.cfi', file);
-    app.use('*.htm', html);
+    app.use('*.cci', acl, code);
+    app.use('*.cgi', acl, form);
+    app.use('*.cfi', acl, file);
+    app.use('*.htm', acl, html);
     app.use(express.static(conf.dcfg)); 
     return app; 
 }
