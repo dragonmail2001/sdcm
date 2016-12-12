@@ -30,6 +30,7 @@ exports = module.exports = function acl(req, res, next) {
     baseUrl = baseUrl.substring(1);
     var context = baseUrl.substring(0,baseUrl.indexOf("/"));
     var rule = conf.acl[context];
+    
     if (rule) {
         var access = true;
         if(rule.allow&&rule.allow.length>0){
