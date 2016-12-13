@@ -160,7 +160,13 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
         return;
     }
 
-    var param = itf.func (req, res, fld, fle); 
+    var param = null;
+    try{
+        param = itf.func (req, res, fld, fle); 
+    }catch(err) {
+        calfuc(req, fuc, req.uuid.cur + 1, false, false, err);
+        return;
+    }
 
     sock.file(array);
     

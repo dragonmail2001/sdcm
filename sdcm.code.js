@@ -32,6 +32,6 @@ function generate2(){
 }
 
 exports = module.exports = function code(req, res, next) {
-    req.session.code = generate1();
+    req.session.code = generate2();
     sock.code(req, res, req.session.code);
 }

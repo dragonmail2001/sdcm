@@ -63,7 +63,7 @@ logj.reqinf = function(ft, req, err){
         Object.defineProperty(req.query, "password", { enumerable: false });  
         return log4js.getLogger('main').info(ft+' time=[%s] method=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
             new Date().getTime() - req.uuid.tim.getTime(), req.method, req.baseUrl, JSON.stringify(req.headers), 
-            JSON.stringify(req.params), req.body, JSON.stringify(req.query),
+            JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
             !err ? '' : err.toString());
     }
 };

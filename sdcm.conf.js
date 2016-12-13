@@ -42,7 +42,7 @@ var config  = {
             host: '192.168.18.207'    
         }
     ],
-    acl:{
+    cacl:{
         "webpc":{
             allow:["*.cnaidai.com"],
             deny:[""]

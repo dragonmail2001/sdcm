@@ -15,21 +15,21 @@ var iset = require('./sdcm.iset.js');
 var conf = require('./sdcm.conf.js'); 
 var wildcard = require('wildcard2');
 
-exports = module.exports = function acl(req, res, next) {
+exports = module.exports = function cacl(req, res, next) {
     if(!iset.set(req, res)) { 
         res.jsonp({"code": -500000,
             "message": 'enverr',
             "success": false
         });  
 
-        logj.reqerr("call-acl-err0", req, 'enverr');          
+        logj.reqerr("call-cacl-err0", req, 'enverr');          
         return; 
     }
     var baseUrl = req.baseUrl;
     var host = req.headers.host;
     baseUrl = baseUrl.substring(1);
     var context = baseUrl.substring(0,baseUrl.indexOf("/"));
-    var rule = conf.acl[context];
+    var rule = conf.cacl[context];
     
     if (rule) {
         var access = true;
@@ -52,7 +52,7 @@ exports = module.exports = function acl(req, res, next) {
         }
         if(!access){
             res.status(403).jsonp({"code": -400000,
-                "message": 'aclforbidden',
+                "message": 'caclforbidden',
                 "success": false
             });
             return;
