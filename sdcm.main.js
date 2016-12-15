@@ -24,6 +24,7 @@ var form = require('./sdcm.form.js');
 var file = require('./sdcm.file.js');
 var html = require('./sdcm.html.js');
 var cacl = require('./sdcm.cacl.js');
+var ccps = require('./sdcm.ccps.js');
 
 var numCPUs = require('os').cpus().length;
 var cach = require('./sdcm.cach.js')();
@@ -65,7 +66,12 @@ function createSdcmObject() {
 
 if (!conf.cluster) {
     var app = createSdcmObject();
-    app.listen(conf.httpport);
+    if(conf.ccps && conf.ccps.enabled){
+        ccps(app.listen(conf.httpport));
+    } else {
+        app.listen(conf.httpport);
+    }
+
     console.log('[%s] [worker:%d] Server started, listen at %d', new Date(), process.pid, conf.httpport);
     logj.logger().info('[worker:%d] Server started, listen at %d', process.pid, conf.httpport);
 
@@ -96,7 +102,11 @@ if (!conf.cluster) {
    
     } else if (cluster.isWorker) {
         var app = createSdcmObject();
-        app.listen(conf.httpport);
+        if(conf.ccps && conf.ccps.enabled){
+            ccps(app.listen(conf.httpport));
+        } else {
+            app.listen(conf.httpport);
+        }
         console.log('[worker:%d] Worker started, listen at %d', cluster.worker.id, conf.httpport);
         logj.logger().info('[worker:%d] Worker started, listen at %d', cluster.worker.id, conf.httpport);
     }
