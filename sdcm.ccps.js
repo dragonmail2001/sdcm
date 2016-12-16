@@ -526,7 +526,20 @@ module.exports = function(server)  {
 
     //socket部分
     io.on('connection', function (socket) {
+        console.log("==========onconnect======="+socket.request.session);
+        var cookie_string = socket.request.headers["cookie"];
+        console.log(">>>>>>cookie: "+cookie_string);
+        var cookie = require('cookie');
+        var parsed_cookies = cookie.parse(cookie_string);
+        var connect_sid = parsed_cookies['sdcm.sid'];
+        console.log(">>>>>>sid:"+connect_sid);
+        var cach = require('./sdcm.cach.js')();
+        var cache = new cach(conf.cach);
+        cache.get("WXxnBu2ep-ikJMle-m8cGFzRwyHzunrM",function(err, session){
+            console.log(">>>>>>>>sessionData:"+err+"::"+JSON.stringify(session));
+        });
         socket.emit(conf.ccps.id, socket.id);
+        
 
         socket.on("disconnect", function() {
             //store.lrem("users", 0, socket.id);
