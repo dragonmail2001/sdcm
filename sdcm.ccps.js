@@ -500,12 +500,13 @@ function adapter(uri, opts) {
             var socket = Redis.io.connected[message.id];
             if(socket != null) {
                 socket.join(message.room);
+                io.to(message.room).emit("room", message.room, message.message);
             }
         });
     };
 
-    Redis.sock = function (link, id, room) {
-        this.pubClient.publish(link, JSON.stringify({"id":id,"room":room}));
+    Redis.sock = function (link, id, room, message) {
+        this.pubClient.publish(link, JSON.stringify({"id":id,"room":room,"message":message}));
     };
 
     Redis.uid = uid;
@@ -523,6 +524,7 @@ function convertFromExpressMiddleware(middleware) {
         middleware(socket.request, socket.request.res, next);
     };
 }
+function saveMsg(){}
 
 module.exports = function(server, session)  {
     var tcp = Server(server).adapter(adapter());
@@ -560,11 +562,10 @@ module.exports = function(server, session)  {
             io.to(room).emit('room', room, message);
         });
 
-        socket.on("chat", function (from, to) {
-            var room = "test";
+        socket.on("chat", function (from, to, message) {
+            var room = from<to?(""+from+to):""+to+from;
             var frid = socket.id;
-            
-            var room = "test";
+            console.log("from:"+from+"::to:"+to+"::room:"+room+"::message:"+message);
 
             tcp.adapter().pubClient.get(to, function(err, data) {
                 if (err) {
@@ -575,17 +576,16 @@ module.exports = function(server, session)  {
                 if (data) {
                     var toid = JSON.parse(data).socketid;
                     console.log("=========chat=========frid:"+frid+", toid:"+toid+", room:"+room);
-                    tcp.adapter().sock(conf.ccps.link, frid, room);
-                    tcp.adapter().sock(conf.ccps.link, toid, room);
-                    // io.to(room).emit('room', room, message);
+                    socket.join(room);
+                    tcp.adapter().sock(conf.ccps.link, toid, room, message);
                 } else {
                     // 不在线
-                    tcp.adapter().sock(conf.ccps.link, frid, room);
+                    console.log("======"+to+" offline=====");
+                    socket.join(room);
                     io.to(room).emit('room', room, message);
+                    saveMsg();
                 }
             });
-
-            // io.to(room).emit('room', room, message);
         });
     });
 }
