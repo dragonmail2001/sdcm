@@ -500,7 +500,7 @@ function adapter(uri, opts) {
             var socket = Redis.io.connected[message.id];
             if(socket != null) {
                 socket.join(message.room);
-                io.to(message.room).emit("room", message.room, message.message);
+                io.to(message.room).emit("chat", message.room, message.message);
             }
         });
     };
@@ -559,11 +559,11 @@ module.exports = function(server, session)  {
         });        
 
         socket.on(conf.ccps.room, function (room, message) {
-            io.to(room).emit('room', room, message);
+            io.to(room).emit('chat', room, message);
         });
 
         socket.on("chat", function (from, to, message) {
-            var room = from<to?(""+from+to):""+to+from;
+            var room = from<to?(from+"-"+to):to+"-"+from;
             var frid = socket.id;
             console.log("from:"+from+"::to:"+to+"::room:"+room+"::message:"+message);
 
@@ -582,7 +582,7 @@ module.exports = function(server, session)  {
                     // 不在线
                     console.log("======"+to+" offline=====");
                     socket.join(room);
-                    io.to(room).emit('room', room, message);
+                    io.to(room).emit('chat', room, message);
                     saveMsg();
                 }
             });
