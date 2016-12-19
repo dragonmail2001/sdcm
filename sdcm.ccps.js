@@ -518,32 +518,36 @@ function adapter(uri, opts) {
 
 }
 
-module.exports = function(server)  {
+function convertFromExpressMiddleware(middleware) {
+    return function(socket, next) {
+        middleware(socket.request, socket.request.res, next);
+    };
+}
+
+module.exports = function(server, session)  {
     var tcp = Server(server).adapter(adapter());
     var io = tcp.of(conf.ccps.namespace);  
 
-    tcp.adapter().link(conf.ccps.link, io);  
+    tcp.adapter().link(conf.ccps.link, io);
+    io.use(convertFromExpressMiddleware(session));
 
     //socket部分
     io.on('connection', function (socket) {
-        console.log("==========onconnect======="+socket.request.session);
-        var cookie_string = socket.request.headers["cookie"];
-        console.log(">>>>>>cookie: "+cookie_string);
-        var cookie = require('cookie');
-        var parsed_cookies = cookie.parse(cookie_string);
-        var connect_sid = parsed_cookies['sdcm.sid'];
-        console.log(">>>>>>sid:"+connect_sid);
-        var cach = require('./sdcm.cach.js')();
-        var cache = new cach(conf.cach);
-        cache.get("WXxnBu2ep-ikJMle-m8cGFzRwyHzunrM",function(err, session){
-            console.log(">>>>>>>>sessionData:"+err+"::"+JSON.stringify(session));
-        });
-        socket.emit(conf.ccps.id, socket.id);
-        
+        console.log("==========onconnect======="+ JSON.stringify(socket.request.session));
+
+        var session = socket.request.session;
+        if(session.user&&session.user.userId){
+            var data = JSON.stringify({socketid:socket.id,ip:session.user.addr,username:session.user.username});
+            tcp.adapter().pubClient.set(session.user.userId, data);
+            socket.emit(conf.ccps.id, session.user.userId);
+        } else {
+            socket.emit(conf.ccps.id, "");
+        }
 
         socket.on("disconnect", function() {
-            //store.lrem("users", 0, socket.id);
-            //delete sockets[socket.id];
+            if(session.user&&session.user.userId){
+                tcp.adapter().pubClient.del(session.user.userId);    
+            }
         });
 
         socket.on(conf.ccps.join, function (frid, toid, room) {
@@ -554,6 +558,34 @@ module.exports = function(server)  {
 
         socket.on(conf.ccps.room, function (room, message) {
             io.to(room).emit('room', room, message);
+        });
+
+        socket.on("chat", function (from, to) {
+            var room = "test";
+            var frid = socket.id;
+            
+            var room = "test";
+
+            tcp.adapter().pubClient.get(to, function(err, data) {
+                if (err) {
+                    console.log(err.toString());
+                    return;
+                }
+                console.log("=======chat======data:"+data);
+                if (data) {
+                    var toid = JSON.parse(data).socketid;
+                    console.log("=========chat=========frid:"+frid+", toid:"+toid+", room:"+room);
+                    tcp.adapter().sock(conf.ccps.link, frid, room);
+                    tcp.adapter().sock(conf.ccps.link, toid, room);
+                    // io.to(room).emit('room', room, message);
+                } else {
+                    // 不在线
+                    tcp.adapter().sock(conf.ccps.link, frid, room);
+                    io.to(room).emit('room', room, message);
+                }
+            });
+
+            // io.to(room).emit('room', room, message);
         });
     });
 }
