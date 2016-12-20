@@ -501,13 +501,13 @@ function adapter(uri, opts) {
             if(socket != null) {
                 socket.join(message.room);
                 // console.log("==========link message=======");
-                io.to(message.room).emit(conf.ccps.chat, 0, "success", message.room, message.data);
+                io.to(message.room).emit(conf.ccps.chat, 0, "success", message.room, message.data, message.from, message.fromName);
             }
         });
     };
 
-    Redis.sock = function (link, id, room, data) {
-        this.pubClient.publish(link, JSON.stringify({"id":id,"room":room,"data":data}));
+    Redis.sock = function (link, id, room, data, from, fromName) {
+        this.pubClient.publish(link, JSON.stringify({"id":id,"room":room,"data":data,"from":from,"fromName":fromName}));
     };
 
     Redis.uid = uid;
@@ -576,13 +576,25 @@ module.exports = function(server, session)  {
                     return;
                 }
                 // console.log("=======chat======data:"+data);
+                var session = socket.request.session;
+                var from="",
+                    fromName="";
+                if(session.user&&session.user.userId){
+                    from = session.user.userId;
+                    fromName = session.user.userName;
+                } else {
+                    socket.emit(conf.ccps.chat, 401, "no login", "", message);
+                    return;
+                }
                 if (data) {
                     var toid = JSON.parse(data).socketid;
-                    tcp.adapter().sock(conf.ccps.link, toid, room, message);
+                    tcp.adapter().sock(conf.ccps.link, toid, room, message, from, fromName);
                 } else {
                     // 不在线
                     // console.log("============b offline==========");
-                    io.to(room).emit(conf.ccps.chat, 0, "success", room, message);
+                    
+                    
+                    io.to(room).emit(conf.ccps.chat, 0, "success", room, message, from, fromName);
                     saveMsg();
                 }
             });
