@@ -47,10 +47,8 @@ var config  = {
         cluster: true,
         namespace:"sdcmnp",
         link:"sdcmlk",
-        seekUid:"seekUid",
         id:"id",
-        join:"join",
-        room:"room"
+        chat:"chat"
     },
     cacl:{
         "webpc":{

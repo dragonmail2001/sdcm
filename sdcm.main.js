@@ -14,7 +14,7 @@ var express = require('express');
 var cluster = require('cluster');
 var graceful = require('graceful');
 var bodyParser = require('body-parser'); 
-var expressSession = require('express-session');
+var session = require('express-session');
 var cookieParser = require('cookie-parser');
 
 var conf = require('./sdcm.conf.js');
@@ -28,6 +28,17 @@ var ccps = require('./sdcm.ccps.js');
 
 var numCPUs = require('os').cpus().length;
 var cach = require('./sdcm.cach.js')();
+var cache = new cach(conf.cach);
+var sess = session({
+    store: cache,
+    saveUninitialized: false,
+    secret: conf.sess.key,
+    name: conf.sess.name,
+    resave: true,
+    cookie: {
+        maxAge: conf.sess.time
+    }
+});
 
 function createSdcmObject() {
     var app = express();
@@ -35,25 +46,8 @@ function createSdcmObject() {
     if (conf.debug)
         app.set('case sensitive routing', true);
 
-    var cache = new cach(conf.cach);
-    var session = expressSession({
-        store: cache,
-        saveUninitialized: false,
-        secret: conf.sess.key,
-        name: conf.sess.name,
-        resave: true,
-        cookie: {
-            maxAge: conf.sess.time
-        }
-    })
-    app.use(session);
+    app.use(sess);
     cache.replaceGenerate();
-
-    // Test Session
-    app.use(function(req, res, next) {
-        req.session.test = "111";
-        next();
-    });
 
     app.use(cookieParser(conf.sess.key));
     app.use(bodyParser.urlencoded({ 
@@ -68,17 +62,16 @@ function createSdcmObject() {
     app.use('*.cfi', cacl, file);
     app.use('*.htm', cacl, html);
     app.use(express.static(conf.dcfg));
-
-    var server = app.listen(conf.httpport);
-    if (conf.ccps && conf.ccps.enabled)
-        ccps(server, session);
-
     return app; 
 }
 
 if (!conf.cluster) {
     var app = createSdcmObject();
-    
+    if(conf.ccps && conf.ccps.enabled){
+        ccps(app.listen(conf.httpport), sess);
+    } else {
+        app.listen(conf.httpport);
+    }
     console.log('[%s] [worker:%d] Server started, listen at %d', new Date(), process.pid, conf.httpport);
     logj.logger().info('[worker:%d] Server started, listen at %d', process.pid, conf.httpport);
 
@@ -109,7 +102,11 @@ if (!conf.cluster) {
    
     } else if (cluster.isWorker) {
         var app = createSdcmObject();
-        
+        if(conf.ccps && conf.ccps.enabled){
+            ccps(app.listen(conf.httpport), sess);
+        } else {
+            app.listen(conf.httpport);
+        }
         console.log('[worker:%d] Worker started, listen at %d', cluster.worker.id, conf.httpport);
         logj.logger().info('[worker:%d] Worker started, listen at %d', cluster.worker.id, conf.httpport);
     }

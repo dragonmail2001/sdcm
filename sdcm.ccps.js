@@ -500,13 +500,14 @@ function adapter(uri, opts) {
             var socket = Redis.io.connected[message.id];
             if(socket != null) {
                 socket.join(message.room);
-                io.to(message.room).emit("chat", message.room, message.message);
+                // console.log("==========link message=======");
+                io.to(message.room).emit(conf.ccps.chat, 0, "success", message.room, message.data);
             }
         });
     };
 
-    Redis.sock = function (link, id, room, message) {
-        this.pubClient.publish(link, JSON.stringify({"id":id,"room":room,"message":message}));
+    Redis.sock = function (link, id, room, data) {
+        this.pubClient.publish(link, JSON.stringify({"id":id,"room":room,"data":data}));
     };
 
     Redis.uid = uid;
@@ -519,19 +520,25 @@ function adapter(uri, opts) {
 
 }
 
-function convertFromExpressMiddleware(middleware) {
+function fromMiddleware(middleware) {
     return function(socket, next) {
         middleware(socket.request, socket.request.res, next);
     };
 }
 function saveMsg(){}
 
+function createRoomid(from, to) {
+    return from < to ? (from + "-" + to) : to + "-" + from;
+}
+/*
+    {code:401, err:""}  0-成功  401-未登录  2-其他
+*/
 module.exports = function(server, session)  {
     var tcp = Server(server).adapter(adapter());
     var io = tcp.of(conf.ccps.namespace);  
 
     tcp.adapter().link(conf.ccps.link, io);
-    io.use(convertFromExpressMiddleware(session));
+    io.use(fromMiddleware(session));
 
     //socket部分
     io.on('connection', function (socket) {
@@ -552,37 +559,30 @@ module.exports = function(server, session)  {
             }
         });
 
-        socket.on(conf.ccps.join, function (frid, toid, room) {
-            console.log("=========="+frid+"::"+toid+"::"+room);
-            tcp.adapter().sock(conf.ccps.link, frid, room);
-            tcp.adapter().sock(conf.ccps.link, toid, room);
-        });        
-
-        socket.on(conf.ccps.room, function (room, message) {
-            io.to(room).emit('chat', room, message);
-        });
-
-        socket.on("chat", function (from, to, message) {
-            var room = from<to?(from+"-"+to):to+"-"+from;
-            var frid = socket.id;
-            console.log("from:"+from+"::to:"+to+"::room:"+room+"::message:"+message);
+        socket.on("chat", function (to, message) {
+            var session = socket.request.session;
+            if(!session.user || !session.user.userId){
+                // console.log("===========not login=========");
+                socket.emit(conf.ccps.chat, 401, "no login", "", message);
+                return;
+            }
+            var room = createRoomid(session.user.userId, to);
+            socket.join(room);
+            // console.log("from:"+from+"::to:"+to+"::room:"+room+"::message:"+message);
 
             tcp.adapter().pubClient.get(to, function(err, data) {
                 if (err) {
                     console.log(err.toString());
                     return;
                 }
-                console.log("=======chat======data:"+data);
+                // console.log("=======chat======data:"+data);
                 if (data) {
                     var toid = JSON.parse(data).socketid;
-                    console.log("=========chat=========frid:"+frid+", toid:"+toid+", room:"+room);
-                    socket.join(room);
                     tcp.adapter().sock(conf.ccps.link, toid, room, message);
                 } else {
                     // 不在线
-                    console.log("======"+to+" offline=====");
-                    socket.join(room);
-                    io.to(room).emit('chat', room, message);
+                    // console.log("============b offline==========");
+                    io.to(room).emit(conf.ccps.chat, 0, "success", room, message);
                     saveMsg();
                 }
             });
