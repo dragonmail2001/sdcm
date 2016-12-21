@@ -12,7 +12,9 @@
 const ioredis = require('ioredis');
 const Server = require('socket.io')
 
-const conf = require("./sdcm.conf.js");
+var conf = require("./sdcm.conf.js");
+var logj = require('./sdcm.logj.js');
+var sock = require('./sdcm.sock.js');
 
 /**
  * Module dependencies.
@@ -38,6 +40,55 @@ var requestTypes = {
     clients: 0,
     clientRooms: 1,
 };
+
+/*
+    {code:1, err:""}  0-成功  1-未登录  2-其他
+
+    code  结果标识  0-代表成功    >0 -非零代表失败
+    type  消息类型  0-已登陆  1-未登录
+    sdcm  平台消息  固定值    
+*/
+
+var chatCode = {
+    SUCC : 0,
+    NOLOGIN : 1,
+    FAIL : 2,
+    SENDSUC : 3,
+    SENDERR : 4,
+    LEAVING : 5,
+    OTHER : 6
+};
+
+var chatType = {
+    ONLINE : 0,    //用户是否在线
+    SDCM : 1      //普通消息
+}
+
+function saveMessage(code, from, to, room, type, uuid, message) {
+    var cfg = {
+        host: conf.ccps.addr,
+        port: conf.ccps.port,
+        iurl: conf.ccps.iurl, //"/contentApp?actn=detailByCategoryId",
+        uuid: "messageApp",
+        meth: "post",
+        type: "sdcm"             
+    };
+
+    var param = {
+        clzz: "['java.lang.Integer','java.lang.Long','java.lang.Long','java.lang.String','java.lang.Integer','java.lang.String','java.lang.String']",
+        json: [code, from, to, room, type, uuid, message]
+    };
+    console.log(">>>>>>>param: code="+code+", from="+from+", to="+to+", room="+room+", type="+type+", uuid="+uuid+", message="+message);
+
+    /*
+    sock.ccps(conf, param, function(err, obj){
+        if(err) {
+            logj.lgccps().error(to + " to " + room + 
+                " message queue err " + (!err ? '' : err.toString())); 
+        }
+    });
+    */
+}
 
 /**
  * Returns a redis Adapter class.
@@ -496,18 +547,44 @@ function adapter(uri, opts) {
             if (channel != conf.ccps.link){
                 return;
             }
-            var message = JSON.parse(data);
-            var socket = Redis.io.connected[message.id];
-            if(socket != null) {
-                socket.join(message.room);
-                // console.log("==========link message=======");
-                io.to(message.room).emit(conf.ccps.chat, 0, "success", message.room, message.data, message.from, message.fromName);
+
+            try {
+                var message = JSON.parse(data);
+                var socket = Redis.io.connected[message.id];
+                if(socket != null) {
+                    socket.join(message.room);
+                    io.to(message.room).emit(
+                        conf.ccps.chat,
+                        chatCode.SUCC, 
+                        message.type,
+                        message.room,
+                        message.uuid, 
+                        message.data,
+                        message.from
+                    );   
+
+                    //保存到db作为用户的聊天记录
+                    saveMessage(chatCode.SENDSUC, message.from, 
+                        message.to, message.room, message.type, 
+                        message.uuid, message.data);
+                }
+
+            }catch(err) {
+                logj.lgccps().error(data + "::" + (!err ? '' : err.toString())); 
             }
         });
     };
 
-    Redis.sock = function (link, id, room, data, from, fromName) {
-        this.pubClient.publish(link, JSON.stringify({"id":id,"room":room,"data":data,"from":from,"fromName":fromName}));
+    Redis.sock = function (link, id, from, to, room, type, uuid, data) {
+        this.pubClient.publish(link, JSON.stringify({
+            "id":id,
+            "from":from,
+            "to":to,
+            "room":room, 
+            "type":type, 
+            "uuid":uuid, 
+            "data":data
+        }));
     };
 
     Redis.uid = uid;
@@ -525,33 +602,32 @@ function fromMiddleware(middleware) {
         middleware(socket.request, socket.request.res, next);
     };
 }
-function saveMsg(){}
 
 function createRoomid(from, to) {
     return from < to ? (from + "-" + to) : to + "-" + from;
 }
-/*
-    {code:401, err:""}  0-成功  401-未登录  2-其他
-*/
-module.exports = function(server, session)  {
+
+module.exports = function(server,session)  {
     var tcp = Server(server).adapter(adapter());
     var io = tcp.of(conf.ccps.namespace);  
 
-    tcp.adapter().link(conf.ccps.link, io);
+    tcp.adapter().link(conf.ccps.link, io);  
     io.use(fromMiddleware(session));
 
     //socket部分
     io.on('connection', function (socket) {
-        console.log("==========onconnect======="+ JSON.stringify(socket.request.session));
-
+        var code = chatCode.NOLOGIN;
+        var from = "";
         var session = socket.request.session;
-        if(session.user&&session.user.userId){
+        if( session.user && session.user.userId ) {
             var data = JSON.stringify({socketid:socket.id,ip:session.user.addr,username:session.user.username});
             tcp.adapter().pubClient.set(session.user.userId, data);
-            socket.emit(conf.ccps.id, session.user.userId);
-        } else {
-            socket.emit(conf.ccps.id, "");
+            code = chatCode.SUCC ;
+            from = session.user.userId;
         }
+        console.log(">>>>chat connect: code"+code);
+        socket.emit(conf.ccps.chat, code, chatType.ONLINE, "", socket.id, "", from);
+        console.log(">>>>chat connect: code"+code+", type:"+chatType.ONLINE+", uuid:"+socket.id);
 
         socket.on("disconnect", function() {
             if(session.user&&session.user.userId){
@@ -559,44 +635,49 @@ module.exports = function(server, session)  {
             }
         });
 
-        socket.on("chat", function (to, message) {
+        socket.on(conf.ccps.chat, function (to, type, uuid, message) {
             var session = socket.request.session;
             if(!session.user || !session.user.userId){
-                // console.log("===========not login=========");
-                socket.emit(conf.ccps.chat, 401, "no login", "", message);
+                socket.emit(conf.ccps.chat, chatCode.NOLOGIN, 
+                    chatType.ONLINE, uuid, message);
                 return;
             }
+
             var room = createRoomid(session.user.userId, to);
             socket.join(room);
-            // console.log("from:"+from+"::to:"+to+"::room:"+room+"::message:"+message);
 
             tcp.adapter().pubClient.get(to, function(err, data) {
-                if (err) {
-                    console.log(err.toString());
-                    return;
+                if(!err) {
+                    if(data != null) {
+                        try {
+                            var toid = JSON.parse(data).socketid;
+                            tcp.adapter().sock(conf.ccps.link, 
+                                toid, 
+                                session.user.userId,
+                                to,
+                                room, 
+                                type, 
+                                uuid, 
+                                message
+                            );
+                            return;
+                        }catch(err) {//消息发送失败
+                            logj.lgccps().error(to + " join " + room + 
+                                " connect err " + (!err ? '' : err.toString()));               
+                        }
+                    }else{//消息发送成功（纪录到db类似留言）
+                        saveMessage(chatCode.LEAVING, session.user.userId, to, room, type, uuid, message);
+                        return;
+                    }
                 }
-                // console.log("=======chat======data:"+data);
-                var session = socket.request.session;
-                var from="",
-                    fromName="";
-                if(session.user&&session.user.userId){
-                    from = session.user.userId;
-                    fromName = session.user.userName;
-                } else {
-                    socket.emit(conf.ccps.chat, 401, "no login", "", message);
-                    return;
-                }
-                if (data) {
-                    var toid = JSON.parse(data).socketid;
-                    tcp.adapter().sock(conf.ccps.link, toid, room, message, from, fromName);
-                } else {
-                    // 不在线
-                    // console.log("============b offline==========");
-                    
-                    
-                    io.to(room).emit(conf.ccps.chat, 0, "success", room, message, from, fromName);
-                    saveMsg();
-                }
+
+                //消息发送失败
+                logj.lgccps().error(to + " join " + room + 
+                    " connect err " + (!err ? '' : err.toString())); 
+                io.to(room).emit(conf.ccps.chat, chatCode.FAIL, type, room, uuid, message, session.user.userId);
+
+                //记录到数据库发送失败的的消息
+                saveMessage(chatCode.SENDERR, session.user.userId, to, room, type, uuid, message);
             });
         });
     });

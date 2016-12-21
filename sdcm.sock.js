@@ -226,6 +226,55 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
      object.end();
 }
 
+sock.ccps = function(citf, param, calfuc) {
+    var options = {hostname: citf.host, port: citf.port, path: citf.iurl, method: citf.meth,headers:null};
+    options.headers={'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8','user':user};
+    if(citf.meth.toUpperCase() == 'GET' && citf.type=='http'){
+        options.path = citf.iurl+"?"+qs.stringify(param);    
+    }else if(citf.type != 'http') {
+        options.headers={'claz':param.claz};
+    }
+
+    options.agent = false;
+    var object = http.request(option, function(output){
+         output.setEncoding('utf8');
+         output.on('data',function(d){
+             body += d;
+         }).on('end', function() {
+            if(!output.headers['errs']) {
+                try{
+                    sody = JSON.parse(body);//  eval('(' + body + ')');
+                    calfuc(false, sody); 
+                }catch(err){
+                    calfuc(true, body); 
+                }
+            }else{
+                logj.strerr("call-dscm-err", option.path, body);   
+                calfuc(true, body);           
+            }
+         }); 
+     });    
+
+     object.on ('error', function(err) {
+        calfuc(true, err);   
+     });
+
+     object.setNoDelay(true);
+     object.setSocketKeepAlive(false);
+     object.setTimeout(conf.timeout, function(){
+        object.abort();
+     });
+
+     if(itf.meth.toUpperCase() == 'POST' || citf.type != 'http'){
+        if(itf.type != 'http') {
+            object.write(JSON.stringify(!param.json ? null : param.json));
+        }else{
+            object.write(qs.stringify(param));
+        }
+     }   
+     object.end();
+}
+
 sock.code = function(req, res, tex) {
     var body = '', option = {
         hostname: conf.code.hostname,

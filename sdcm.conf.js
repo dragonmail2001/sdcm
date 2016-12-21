@@ -47,8 +47,10 @@ var config  = {
         cluster: true,
         namespace:"sdcmnp",
         link:"sdcmlk",
-        id:"id",
-        chat:"chat"
+        chat:"dscm",
+        addr:"",
+        port:3000,
+        iurl:""
     },
     cacl:{
         "webpc":{
