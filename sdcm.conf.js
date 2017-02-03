@@ -13,7 +13,7 @@ var path = require('path');
 
 var config  = {   
     cluster: false,
-    httpport: 8001,
+    httpport: 80,
     timeout: 20000,
     umfs: 2097152,                                   //上传文件总大小上限2m(2 * 1024 * 1024)
     debug: true, 
@@ -48,13 +48,21 @@ var config  = {
         namespace:"sdcmnp",
         link:"sdcmlk",
         chat:"dscm",
-        addr:"",
-        port:3000,
-        iurl:""
+        sync:{
+            addr:"192.168.18.125",
+            port:5520,
+            iurl:"/imApp?actn=talk"
+        },
+        auth:{
+            name:"auth",
+            addr:"192.168.18.254",
+            port:5524,
+            iurl:"/userApp?actn=auth"
+        }
     },
     cacl:{
         "webpc":{
-            allow:["*.cnaidai.com","*.cnaidai.com:*"],
+            allow:["*.cnaidai.com","*.cnaidai.com:*","*"],
             deny:[""]
         },
         "webchat":{

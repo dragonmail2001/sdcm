@@ -10,7 +10,7 @@
  *
  */
 const ioredis = require('ioredis');
-const Server = require('socket.io')
+const Server = require('socket.io');
 
 var conf = require("./sdcm.conf.js");
 var logj = require('./sdcm.logj.js');
@@ -64,30 +64,49 @@ var chatType = {
     SDCM : 1      //普通消息
 }
 
-function saveMessage(code, from, to, room, type, uuid, message) {
+function saveMessage(tag, code, from, to, room, type, uuid, cmsg, call) {
     var cfg = {
-        host: conf.ccps.addr,
-        port: conf.ccps.port,
-        iurl: conf.ccps.iurl, //"/contentApp?actn=detailByCategoryId",
+        host: conf.ccps.sync.addr,
+        port: conf.ccps.sync.port,
+        iurl: conf.ccps.sync.iurl, //"/contentApp?actn=detailByCategoryId",
         uuid: "messageApp",
         meth: "post",
         type: "sdcm"             
     };
-
-    var param = {
-        clzz: "['java.lang.Integer','java.lang.Long','java.lang.Long','java.lang.String','java.lang.Integer','java.lang.String','java.lang.String']",
-        json: [code, from, to, room, type, uuid, message]
+    // var tag="im-laixiangke"; //来源
+    var par = {
+        claz: "['java.lang.String','java.lang.Integer', \
+            'java.lang.Long','java.lang.Long', \
+            'java.lang.Long','java.lang.Integer', \
+            'java.lang.String','java.lang.String']",
+        json: [tag, code, from, to, room, type, uuid, cmsg]
     };
-    console.log(">>>>>>>param: code="+code+", from="+from+", to="+to+", room="+room+", type="+type+", uuid="+uuid+", message="+message);
 
-    /*
-    sock.ccps(conf, param, function(err, obj){
-        if(err) {
-            logj.lgccps().error(to + " to " + room + 
-                " message queue err " + (!err ? '' : err.toString())); 
-        }
-    });
-    */
+    console.log(">>>>>>>param: tag="+tag+", code="+code+", from="+
+        from+", to="+to+", room="+room+", type="+type+
+        ", uuid="+uuid+", message="+cmsg);
+
+    sock.ccps(cfg, par, call);
+    // call(false, {code:0}); 
+}
+
+function authMessage(name, pass, time, call) {
+    var cfg = {
+        host: conf.ccps.auth.addr,
+        port: conf.ccps.auth.port,
+        iurl: conf.ccps.auth.iurl, //"/contentApp?actn=detailByCategoryId",
+        uuid: "userApp",
+        meth: "post",
+        type: "sdcm"             
+    };
+
+    var par = {
+        claz: "['java.lang.String','java.lang.String','java.lang.Long']",
+        json: [name, pass, time]
+    };   
+
+    //sock.ccps(cfg, par, call);
+    call(false, {code:0, userId:name}); 
 }
 
 /**
@@ -564,9 +583,11 @@ function adapter(uri, opts) {
                     );   
 
                     //保存到db作为用户的聊天记录
-                    saveMessage(chatCode.SENDSUC, message.from, 
+                    saveMessage(message.tag, chatCode.SENDSUC, message.from, 
                         message.to, message.room, message.type, 
-                        message.uuid, message.data);
+                        message.uuid, message.data, function(err, obj){
+                            console.log(">>>>>mc rslt:"+JSON.stringify(obj));
+                    });
                 }
 
             }catch(err) {
@@ -575,9 +596,10 @@ function adapter(uri, opts) {
         });
     };
 
-    Redis.sock = function (link, id, from, to, room, type, uuid, data) {
+    Redis.sock = function (link, tag, id, from, to, room, type, uuid, data) {
         this.pubClient.publish(link, JSON.stringify({
-            "id":id,
+            "tag": tag,
+            "id":id, //toUser sock id
             "from":from,
             "to":to,
             "room":room, 
@@ -635,7 +657,19 @@ module.exports = function(server,session)  {
             }
         });
 
-        socket.on(conf.ccps.chat, function (to, type, uuid, message) {
+        socket.on(conf.ccps.auth.name, function(name, pass, time){
+            authMessage(name, pass, time, function(err, obj){
+                var code = chatCode.NOLOGIN;
+                if(!err && obj.code == 0) {
+                    code = chatCode.SUCC;
+                    socket.request.session.user={userId:obj.userId};
+                }
+
+                socket.emit(conf.ccps.auth.name, code);
+            });
+        });
+
+        socket.on(conf.ccps.chat, function (tag, to, type, room, uuid, message) {
             var session = socket.request.session;
             if(!session.user || !session.user.userId){
                 socket.emit(conf.ccps.chat, chatCode.NOLOGIN, 
@@ -643,7 +677,7 @@ module.exports = function(server,session)  {
                 return;
             }
 
-            var room = createRoomid(session.user.userId, to);
+            //var room = createRoomid(session.user.userId, to);
             socket.join(room);
 
             tcp.adapter().pubClient.get(to, function(err, data) {
@@ -652,6 +686,7 @@ module.exports = function(server,session)  {
                         try {
                             var toid = JSON.parse(data).socketid;
                             tcp.adapter().sock(conf.ccps.link, 
+                                tag,
                                 toid, 
                                 session.user.userId,
                                 to,
@@ -666,7 +701,10 @@ module.exports = function(server,session)  {
                                 " connect err " + (!err ? '' : err.toString()));               
                         }
                     }else{//消息发送成功（纪录到db类似留言）
-                        saveMessage(chatCode.LEAVING, session.user.userId, to, room, type, uuid, message);
+                        io.to(room).emit(conf.ccps.chat, chatCode.LEAVING, type, room, uuid, message, session.user.userId);
+                        saveMessage(tag, chatCode.LEAVING, session.user.userId, to, room, type, uuid, message,function(err,obj){
+                            console.log(">>>>>mc== rslt:"+JSON.stringify(obj));
+                        });
                         return;
                     }
                 }
@@ -677,7 +715,9 @@ module.exports = function(server,session)  {
                 io.to(room).emit(conf.ccps.chat, chatCode.FAIL, type, room, uuid, message, session.user.userId);
 
                 //记录到数据库发送失败的的消息
-                saveMessage(chatCode.SENDERR, session.user.userId, to, room, type, uuid, message);
+                saveMessage(tag, chatCode.SENDERR, session.user.userId, to, room, type, uuid, message,function(err,obj){
+                    console.log(">>>>>mc rslt:"+JSON.stringify(obj));
+                });
             });
         });
     });

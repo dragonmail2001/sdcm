@@ -228,7 +228,7 @@ sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
 
 sock.ccps = function(citf, param, calfuc) {
     var options = {hostname: citf.host, port: citf.port, path: citf.iurl, method: citf.meth,headers:null};
-    options.headers={'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8','user':user};
+    options.headers={'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'};
     if(citf.meth.toUpperCase() == 'GET' && citf.type=='http'){
         options.path = citf.iurl+"?"+qs.stringify(param);    
     }else if(citf.type != 'http') {
@@ -236,7 +236,8 @@ sock.ccps = function(citf, param, calfuc) {
     }
 
     options.agent = false;
-    var object = http.request(option, function(output){
+    var body = '',sody = null;
+    var object = http.request(options, function(output){
          output.setEncoding('utf8');
          output.on('data',function(d){
              body += d;
@@ -249,7 +250,7 @@ sock.ccps = function(citf, param, calfuc) {
                     calfuc(true, body); 
                 }
             }else{
-                logj.strerr("call-dscm-err", option.path, body);   
+                logj.strerr("call-dscm-err", options.path, body);   
                 calfuc(true, body);           
             }
          }); 
@@ -265,8 +266,8 @@ sock.ccps = function(citf, param, calfuc) {
         object.abort();
      });
 
-     if(itf.meth.toUpperCase() == 'POST' || citf.type != 'http'){
-        if(itf.type != 'http') {
+     if(citf.meth.toUpperCase() == 'POST' || citf.type != 'http'){
+        if(citf.type != 'http') {
             object.write(JSON.stringify(!param.json ? null : param.json));
         }else{
             object.write(qs.stringify(param));
