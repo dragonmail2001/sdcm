@@ -50,6 +50,24 @@ var config  = {
             port: 6391,
             host: '192.168.100.39'    
     }],
+    ccps:{
+        enabled: true,
+        cluster: true,
+        namespace:"sdcmnp",
+        link:"sdcmlk",
+        chat:"dscm",
+        sync:{
+            addr:"192.168.18.125",
+            port:5520,
+            iurl:"/imApp?actn=talk"
+        },
+        auth:{
+            name:"auth",
+            addr:"192.168.18.254",
+            port:5524,
+            iurl:"/userApp?actn=auth"
+        }
+    },
     cacl:{
         //"webpc":{
         //    allow:["*.cnaidai.com"],
