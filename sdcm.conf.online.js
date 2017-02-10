@@ -57,8 +57,8 @@ var config  = {
         link:"sdcmlk",
         chat:"dscm",
         sync:{
-            addr:"192.168.18.125",
-            port:5520,
+            addr:'192.168.100.56',
+            port:5519
             iurl:"/imApp?actn=talk"
         },
         auth:{
