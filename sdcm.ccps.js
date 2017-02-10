@@ -82,9 +82,9 @@ function saveMessage(tag, code, from, to, room, type, uuid, cmsg, call) {
         json: [tag, code, from, to, room, type, uuid, cmsg]
     };
 
-    console.log(">>>>>>>param: tag="+tag+", code="+code+", from="+
-        from+", to="+to+", room="+room+", type="+type+
-        ", uuid="+uuid+", message="+cmsg);
+    // console.log(">>>>>>>param: tag="+tag+", code="+code+", from="+
+    //     from+", to="+to+", room="+room+", type="+type+
+    //     ", uuid="+uuid+", message="+cmsg);
 
     sock.ccps(cfg, par, call);
     // call(false, {code:0}); 
@@ -586,7 +586,10 @@ function adapter(uri, opts) {
                     saveMessage(message.tag, chatCode.SENDSUC, message.from, 
                         message.to, message.room, message.type, 
                         message.uuid, message.data, function(err, obj){
-                            console.log(">>>>>mc rslt:"+JSON.stringify(obj));
+                            // console.log(">>>>>mc rslt:"+JSON.stringify(obj));
+                            // if(err){
+                            //     logj.lgccps().error("saveMessage call error-003");  
+                            // }
                     });
                 }
 
@@ -642,19 +645,18 @@ module.exports = function(server,session)  {
         var from = "";
         var session = socket.request.session;
         if( session.user && session.user.userId ) {
-            var data = JSON.stringify({socketid:socket.id,ip:session.user.addr,username:session.user.username});
+            var data = JSON.stringify({socketid:socket.id,userName:session.user.userName});
             tcp.adapter().pubClient.set(session.user.userId, data);
             code = chatCode.SUCC ;
             from = session.user.userId;
         }
-        console.log(">>>>chat connect: code"+code);
         socket.emit(conf.ccps.chat, code, chatType.ONLINE, "", socket.id, "", from);
-        console.log(">>>>chat connect: code"+code+", type:"+chatType.ONLINE+", uuid:"+socket.id);
 
         socket.on("disconnect", function() {
-            if(session.user&&session.user.userId){
-                tcp.adapter().pubClient.del(session.user.userId);    
-            }
+            tcp.adapter().pubClient.del(from);
+            // if(session.user&&session.user.userId){
+            //     tcp.adapter().pubClient.del(session.user.userId);    
+            // }
         });
 
         socket.on(conf.ccps.auth.name, function(name, pass, time){
@@ -676,8 +678,17 @@ module.exports = function(server,session)  {
                     chatType.ONLINE, uuid, message);
                 return;
             }
+            try{
+                var messageObj = JSON.parse(message);
+                messageObj.createDate = Date.now()/1000;
+                message = JSON.stringify(messageObj);
+            } catch(e) {
+                socket.emit(conf.ccps.chat, chatCode.FAIL, 
+                    chatType.SDCM, uuid, message);
+                logj.lgccps().error("parse message:" + message + ", err: " + (!e ? '' : e.toString())); 
+                return;
+            }
 
-            //var room = createRoomid(session.user.userId, to);
             socket.join(room);
 
             tcp.adapter().pubClient.get(to, function(err, data) {
@@ -703,7 +714,10 @@ module.exports = function(server,session)  {
                     }else{//消息发送成功（纪录到db类似留言）
                         io.to(room).emit(conf.ccps.chat, chatCode.LEAVING, type, room, uuid, message, session.user.userId);
                         saveMessage(tag, chatCode.LEAVING, session.user.userId, to, room, type, uuid, message,function(err,obj){
-                            console.log(">>>>>mc== rslt:"+JSON.stringify(obj));
+                            // console.log(">>>>>mc== rslt:"+JSON.stringify(obj));
+                            // if(err){
+                            //     logj.lgccps().error("saveMessage call error-001");  
+                            // }
                         });
                         return;
                     }
@@ -716,7 +730,10 @@ module.exports = function(server,session)  {
 
                 //记录到数据库发送失败的的消息
                 saveMessage(tag, chatCode.SENDERR, session.user.userId, to, room, type, uuid, message,function(err,obj){
-                    console.log(">>>>>mc rslt:"+JSON.stringify(obj));
+                    // console.log(">>>>>mc rslt:"+JSON.stringify(obj));
+                    // if(err){
+                    //     logj.lgccps().error("saveMessage call error-002");  
+                    // }
                 });
             });
         });
