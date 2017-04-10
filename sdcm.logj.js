@@ -28,6 +28,15 @@ log4js.configure({
         },	
         pattern: '.yyyy-MM-dd.log',alwaysIncludePattern: true,			
         filename: conf.ldir+'/main', 
+    },{
+        category: 'ccps',
+        type: 'dateFile', 
+        layout: {
+            type: 'pattern',
+            pattern: '[%d %p %c] %m%n'
+        },  
+        pattern: '.yyyy-MM-dd.log',alwaysIncludePattern: true,          
+        filename: conf.ldir+'/ccps', 
     }],
     levels: {
       "[all]": conf.loglevel  	
@@ -70,6 +79,10 @@ logj.reqinf = function(ft, req, err){
 
 logj.logger = function(){
     return log4js.getLogger('main');
+};
+
+logj.lgccps = function(){
+    return log4js.getLogger('ccps');
 };
 
 

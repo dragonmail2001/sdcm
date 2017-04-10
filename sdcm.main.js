@@ -24,9 +24,21 @@ var form = require('./sdcm.form.js');
 var file = require('./sdcm.file.js');
 var html = require('./sdcm.html.js');
 var cacl = require('./sdcm.cacl.js');
+var ccps = require('./sdcm.ccps.js');
 
 var numCPUs = require('os').cpus().length;
 var cach = require('./sdcm.cach.js')();
+var cache = new cach(conf.cach);
+var sess = session({
+    store: cache,
+    saveUninitialized: false,
+    secret: conf.sess.key,
+    name: conf.sess.name,
+    resave: true,
+    cookie: {
+        maxAge: conf.sess.time
+    }
+});
 
 function createSdcmObject() {
     var app = express();
@@ -34,17 +46,7 @@ function createSdcmObject() {
     if (conf.debug)
         app.set('case sensitive routing', true);
 
-    var cache = new cach(conf.cach);
-    app.use(session({
-        store: cache,
-        saveUninitialized: false,
-        secret: conf.sess.key,
-        name: conf.sess.name,
-        resave: true,
-        cookie: {
-            maxAge: conf.sess.time
-        }
-    }));
+    app.use(sess);
     cache.replaceGenerate();
 
     app.use(cookieParser(conf.sess.key));
@@ -59,13 +61,17 @@ function createSdcmObject() {
     app.use('*.cgi', cacl, form);
     app.use('*.cfi', cacl, file);
     app.use('*.htm', cacl, html);
-    app.use(express.static(conf.dcfg)); 
+    app.use(express.static(conf.dcfg));
     return app; 
 }
 
 if (!conf.cluster) {
     var app = createSdcmObject();
-    app.listen(conf.httpport);
+    if(conf.ccps && conf.ccps.enabled){
+        ccps(app.listen(conf.httpport), sess);
+    } else {
+        app.listen(conf.httpport);
+    }
     console.log('[%s] [worker:%d] Server started, listen at %d', new Date(), process.pid, conf.httpport);
     logj.logger().info('[worker:%d] Server started, listen at %d', process.pid, conf.httpport);
 
@@ -96,7 +102,11 @@ if (!conf.cluster) {
    
     } else if (cluster.isWorker) {
         var app = createSdcmObject();
-        app.listen(conf.httpport);
+        if(conf.ccps && conf.ccps.enabled){
+            ccps(app.listen(conf.httpport), sess);
+        } else {
+            app.listen(conf.httpport);
+        }
         console.log('[worker:%d] Worker started, listen at %d', cluster.worker.id, conf.httpport);
         logj.logger().info('[worker:%d] Worker started, listen at %d', cluster.worker.id, conf.httpport);
     }
