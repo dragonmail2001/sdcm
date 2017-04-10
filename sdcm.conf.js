@@ -24,12 +24,12 @@ var config  = {
         'png': true
     },  
     cftp:{
-	    host: "192.168.18.248",
-	    port: 21,
-	    user: "devftp",
-	    password: "aidaidev",
-	    keepalive: 10000,
-	    path: ""
+        host: "192.168.18.248",
+        port: 21,
+        user: "devftp",
+        password: "aidaidev",
+        keepalive: 10000,
+        path: ""
     },
     cach:[{
             port: 6390,
@@ -62,17 +62,17 @@ var config  = {
     },
     cacl:{
         "webpc":{
-            allow:["*.cnaidai.com","*.cnaidai.com:*","*"],
+            allow:["*"],
             deny:[""]
         },
         "webchat":{
             allow:["wechat.cnaidai.com"]
         },
         "webjr":{
-            allow:["a.cnaidai.com"]
+            allow:["*"]
         },
         "wxshop":{
-            allow:["wechat.laixiangke.com"]
+            allow:[]
         },
         "wapshop":{
             allow:["wap.laixiangke.com"]

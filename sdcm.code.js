@@ -34,4 +34,6 @@ function generate2(){
 exports = module.exports = function code(req, res, next) {
     req.session.code = generate2();
     sock.code(req, res, req.session.code);
+    // req.session.code = "1111";
+    // sock.code(req, res, "1111");
 }

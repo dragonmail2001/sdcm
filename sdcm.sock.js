@@ -80,7 +80,7 @@ function calfuc(req, fuc, cur, jum, err, msg) {
 }
 
 function allow(filename) {
-    if(filename == null){
+    if(filename == null || typeof filename != "string"){
         return false;
     }
 
@@ -90,7 +90,7 @@ function allow(filename) {
     }
 
     try{
-        return conf.fext[filename.substr(pos+1)];
+        return conf.fext[filename.substr(pos+1).toLowerCase()];
     }catch(err){
 
     }
@@ -106,7 +106,7 @@ function remove(path) {
     });   
 }
 
-sock.chck = function(fle) {
+sock.chck = function(res, fle) {
     var array = []; if(fle == null) {
         return array;
     }
@@ -153,7 +153,7 @@ sock.file = function(array) {
 }
 
 sock.request = function(cfg, itf, req, res, fld, fle, fuc) {
-    var array = sock.chck(fle);
+    var array = sock.chck(res, fle);
     if(array == null) {
         calfuc(req, fuc, req.uuid.cur + 1, false, false, 
             'cfg.itf.func ftp err');   
