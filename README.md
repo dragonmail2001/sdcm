@@ -11,8 +11,8 @@
  * 关于模块加载的路径说明
  * --------------------------------------------------------------------
  * 这里如果需要引入webapp目录下的相关js文件需要使用process.argv[2]+*.js的模式
- * process.argv[2]是程序启动时候传入的第一个参数“/Workspace/jxg/cloudy-sdcm/webapp”
- * 以node sdcm.main.js /Workspace/jxg/cloudy-sdcm/webapp /Workspace/jxg/logger /Workspace/jxg/upload为例
+ * process.argv[2]是程序启动时候传入的第一个参数“/Workspace/jxg/cloudy-sdcm-jwt/webapp”
+ * 以node sdcm.main.js /Workspace/jxg/cloudy-sdcm-jwt/webapp /Workspace/jxg/logger /Workspace/jxg/upload为例
  * 如果需要引入容器目录下的文件则需要使用process.cwd()+*.js的模式，其中process.cwd() 代表node命令启动的目录
  */
 var ghost = require(process.argv[2]+'/aaaa-test-api/cfg/ghost.js'); 
@@ -66,12 +66,14 @@ class Objc {
              * 容器不使用此参数，一般应用使用它来确定当前接口是否需要鉴权才能访问
              */
             auth : false,
+
             /**
              * 容器保留关键字
              * fext是文件扩展名控制，fmax是单个文件大小限制字节为单位
              */                  
             *fext : {},
-            *fmax : 234234, 
+            *fmax : 234234,  
+                      
             //代表返回的内容是什么格式：json、text、file等
             *type : "json|text|file", 
             //itfs是一个对象数组，其中的每个对象都代表一个服务的配置
@@ -292,6 +294,6 @@ exports = module.exports = { Objc } ;
 六、容器的安装和启动
     在sdcm-cloudy-jwt目录下执行npm install 和npm install log4js@0.6.26 -g 视需要执行npm install jwt-simple
     启动命令
-    node sdcm.main.js /Workspace/jxg/cloudy-sdcm/webapp /Workspace/jxg/logger /Workspace/jxg/upload
+    node sdcm.main.js /Workspace/jxg/cloudy-sdcm-jwt/webapp /Workspace/jxg/logger /Workspace/jxg/upload
 
 --------------------------------------sdcm end---------------------------------------------------------
