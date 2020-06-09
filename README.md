@@ -11,8 +11,8 @@
  * 关于模块加载的路径说明
  * --------------------------------------------------------------------
  * 这里如果需要引入webapp目录下的相关js文件需要使用process.argv[2]+*.js的模式
- * process.argv[2]是程序启动时候传入的第一个参数“/Workspace/jxg/cloudy-sdcm-jwt/webapp”
- * 以node sdcm.main.js /Workspace/jxg/cloudy-sdcm-jwt/webapp /Workspace/jxg/logger /Workspace/jxg/upload为例
+ * process.argv[2]是程序启动时候传入的第一个参数“/Workspace/jxg/cloudy-sdcm/webapp”
+ * 以node sdcm.main.js /Workspace/jxg/cloudy-sdcm/webapp /Workspace/jxg/logger /Workspace/jxg/upload为例
  * 如果需要引入容器目录下的文件则需要使用process.cwd()+*.js的模式，其中process.cwd() 代表node命令启动的目录
  */
 var ghost = require(process.argv[2]+'/aaaa-test-api/cfg/ghost.js'); 
