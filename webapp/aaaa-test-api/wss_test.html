@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>查看状态</title>
+</head>
+
+<body>
+  <div>
+    <button onclick="SendData()">查看状态</button>
+  </div>
+  <script>
+  var ws;
+  function SendData() {
+    console.log("sdfs");
+    try{
+      //alert("beston");
+      ws.send("beston");
+    }catch(ex){
+      alert(ex.message);
+    }
+
+    //ws.close();
+  }
+
+  ws = new WebSocket("ws://192.168.1.91:8001/sdcm");//连接服务器
+  ws.onopen = function(event){
+    alert("已经与服务器建立了连接rn当前连接状态："+this.readyState+"::"+this.id);
+  };
+  
+  ws.onmessage = function(event){
+    alert("接收到服务器发送的数据：rn"+event.data);
+  };
+
+  ws.onclose = function(event){
+    alert("已经与服务器断开连接rn当前连接状态："+this.readyState);
+  };
+
+  ws.onerror = function(event){
+    alert("WebSocket异常！");
+  };
+
+    function check(){
+      console.log(123);
+    }
+    
+  </script>
+</body>
+
+</html>

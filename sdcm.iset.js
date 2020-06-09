@@ -11,48 +11,74 @@
  */
 var getContextName = require('./sdcm.util.js').getContextName; 
 var getClientIp = require('./sdcm.util.js').getClientIp;  
+var loadConf = require('./sdcm.util.js').loadConf;
 var conf = require('./sdcm.conf.js');
 var path = require('path');
 var url = require('url');
 
-var iset = exports = module.exports = {};
+// Generate four random hex digits.  
+//function _s4id() {  
+//   return (((1+Math.random())*0x10000)|0).toString(16).substring(1);  
+//};  
+// Generate a pseudo-GUID by concatenating random hexadecimal.  
+//function _guid() {  
+//   return (_s4id()+_s4id()+_s4id()+_s4id()+_s4id()+_s4id()+_s4id()+_s4id());  
+//}; 
 
-iset.set = function(req, res) {
-    req.user = {};
-    req.conf = {};
-    req.rslt = {};
-    req.uuid = {};
-
-    req.uuid.max = 0;
-    req.uuid.cur = 0;
-    //req.uuid.upf = 0;
-    req.uuid.msg = 'ok';
-    req.uuid.err = false;
-    req.uuid.jum = false;
-    req.uuid.moc = false;
-    req.uuid.tim = new Date();
-    req.uuid.app = '';
-
-    req.conf.btpl = false;
-
-    req.user.code = req.session.code;
-    req.user.user = req.session.user;
-    req.user.addr = getClientIp(req); 
+exports = module.exports = function iset(req, res, next) {
+    req._$sdcm$_ = {
+        user: {
+            code: null,
+            user: null,
+            addr: getClientIp(req)
+        },
+        conf: {
+            btpl: false
+        },
+        objc: {},
+        rslt: {},
+        uuid: {
+            max: 0,
+            cur: 0,
+            msg: 'ok',
+            tim: new Date(),
+            app: ''
+        },
+        exit: false,
+        file: false
+    };
+    req._$cjwt$_ = {};
 
     var cctx = req.baseUrl.split('/');
     if(cctx.length <= 0) {
-        res.jsonp({"code": -900000,
-            "message": 'ctxerr',
+        res.status(500).jsonp({"code": 500,
+            "message": 'ctxerr format err!!!',
             "success": false
-        });
-        return false;
+        });        
+        return;
     } 
 
-    if(cctx.length > 2) { req.uuid.app = cctx[1]; }
-
-    req.conf.name = getContextName(cctx[cctx.length-1]);
+    if(cctx.length > 2) { req._$sdcm$_.uuid.app = cctx[1]; }
+    req._$sdcm$_.conf.name = getContextName(cctx[cctx.length-1]);
     cctx.splice(cctx.length-1, 1);
-    req.conf.dcfg = path.join(conf.dcfg, cctx.join('/'), req.conf.name + '.cfg')
-    req.conf.dtpl = path.join(conf.dcfg, cctx.join('/'), req.conf.name + '.htm'); 
-    return true;      
+
+    req._$sdcm$_.conf.dcfg = path.join(process.argv[2], 
+        cctx.join('/'), 
+        req._$sdcm$_.conf.name + '.cfg'
+    );
+
+    res.header("Access-Control-Allow-Credentials", "true");
+    res.header("Access-Control-Allow-Origin", req.headers.origin);
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods","PUT,POST,GET,DELETE,OPTIONS"); 
+
+    var cfg = loadConf(req, res);
+    if(!cfg) {  
+        res.status(500).jsonp({"message": 'ctxerr path not surpport!!'});                
+        return;
+    }
+
+    cfg.baseUrl = req.baseUrl;
+    req._$sdcm$_.conf.ocfg = cfg;
+    next();      
 }

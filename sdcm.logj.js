@@ -9,7 +9,6 @@
  * @Source: https://github.com/dragonmail2001
  *
  */
-var conf = require('./sdcm.conf.js');
 var log4js = require('log4js');
 
 /**
@@ -27,8 +26,8 @@ log4js.configure({
             pattern: '[%d %p %c] %m%n'
         },	
         pattern: '.yyyy-MM-dd.log',alwaysIncludePattern: true,			
-        filename: conf.ldir+'/main', 
-    },{
+        filename: process.argv[3]+'/main/main', 
+    }/*,{
         category: 'ccps',
         type: 'dateFile', 
         layout: {
@@ -36,10 +35,12 @@ log4js.configure({
             pattern: '[%d %p %c] %m%n'
         },  
         pattern: '.yyyy-MM-dd.log',alwaysIncludePattern: true,          
-        filename: conf.ldir+'/ccps', 
-    }],
+        filename: process.argv[3]+'/main/ccps', 
+    }*/],
     levels: {
-      "[all]": conf.loglevel  	
+        "log_file":"ALL",
+        "console":"ALL",
+        "log_date":"ALL" 	
     }
 });
 
@@ -54,35 +55,47 @@ log4js.configure({
 //};
 var logj = exports = module.exports = {};
 
+logj.toStr = function(err) {
+    var str = "";
+    if(err) {
+        str = err.toString();
+        if(err.message) {
+            str = err.message;
+        }
+
+        if(err.stack) {
+            str = str + "\n" + err.stack;
+        }
+    }
+
+    return str;
+};
+
 logj.strerr = function(ft, str, err){
-    return log4js.getLogger('main').error(ft + ' path=[%s] err=[%s]', str, !err ? '' : err.toString());
+    return log4js.getLogger('main').error(ft + ' path=[%s] err=[%s]', str, logj.toStr(err));
 };
 
 logj.reqerr = function(ft, req, err){
     return log4js.getLogger('main').error(ft+' time=[%s] method=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
-        new Date().getTime() - req.uuid.tim.getTime(), req.method, req.baseUrl, JSON.stringify(req.headers), 
-        JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query), !err ? '' : err.toString());
+        new Date().getTime() - req._$sdcm$_.uuid.tim.getTime(), req.method, req.baseUrl, JSON.stringify(req.headers), 
+        JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query), logj.toStr(err));
 };
 
 logj.reqinf = function(ft, req, err){
-    var waste = new Date().getTime() - req.uuid.tim.getTime();
+    var waste = new Date().getTime() - req._$sdcm$_.uuid.tim.getTime();
     if(waste > 10){  
         Object.defineProperty(req.params, "password", { enumerable: false });
         Object.defineProperty(req.body, "password", { enumerable: false });
         Object.defineProperty(req.query, "password", { enumerable: false });  
         return log4js.getLogger('main').info(ft+' time=[%s] method=[%s] url=[%s] head=[%s] param=[%s] body=[%s] query=[%s] err=[%s]', 
-            new Date().getTime() - req.uuid.tim.getTime(), req.method, req.baseUrl, JSON.stringify(req.headers), 
+            new Date().getTime() - req._$sdcm$_.uuid.tim.getTime(), req.method, req.baseUrl, JSON.stringify(req.headers), 
             JSON.stringify(req.params), JSON.stringify(req.body), JSON.stringify(req.query),
-            !err ? '' : err.toString());
+            logj.toStr(err));
     }
 };
 
 logj.logger = function(){
     return log4js.getLogger('main');
-};
-
-logj.lgccps = function(){
-    return log4js.getLogger('ccps');
 };
 
 
