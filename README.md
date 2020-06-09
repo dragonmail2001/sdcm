@@ -289,6 +289,6 @@ exports = module.exports = { Objc } ;
 六、容器的安装和启动
     在sdcm-cloudy-jwt目录下执行npm install 和npm install log4js@0.6.26 -g 视需要执行npm install jwt-simple
     启动命令
-    node sdcm.main.js /Workspace/jxg/cloudy-sdcm-jwt/webapp /Workspace/jxg/logger /Workspace/jxg/upload
+    node sdcm.main.js /Workspace/jxg/cloudy-sdcm/webapp /Workspace/jxg/logger /Workspace/jxg/upload
 
 --------------------------------------sdcm end---------------------------------------------------------
