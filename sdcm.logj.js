@@ -18,8 +18,8 @@ var log4js = require('log4js');
  *
  */
 log4js.configure({
-    appenders: [{
-        category: 'main',
+    appenders: [{"type":"console"},{
+        category: 'main',//"type":"console"
         type: 'dateFile', 
         layout: {
             type: 'pattern',
